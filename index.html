@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Резиденция — приложение жителя</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --bg-tint:#F3F5F2;
+    --card:#FFFFFF;
+    --border:rgba(24,24,20,0.07);
+    --text:#26241F;
+    --text-muted:#948F85;
+    --accent:#5F8A81;
+    --accent-dark:#4C716A;
+    --accent-soft:#E7EFEC;
+    --success:#6FA377;
+    --success-soft:#E7F2E8;
+    --amber:#C99A55;
+    --amber-soft:#F5EBDC;
+  }
+  *{ font-family:'Manrope',system-ui,sans-serif; }
+  body{ background:var(--bg-tint); }
+  .outer-bg{ background: radial-gradient(120% 120% at 50% 0%, #F6F4EE 0%, #EEF1EC 55%, #E7ECE8 100%); }
+  .phone{ background:var(--bg); color:var(--text); }
+  .card{ background:var(--card); border:1px solid var(--border); }
+  .muted{ color:var(--text-muted); }
+  .fade-in{ animation: fadeIn .45s ease both; }
+  .fade-up{ animation: fadeUp .5s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
+  .sheet-in{ animation: sheetIn .38s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes sheetIn{ from{ transform:translateY(100%);} to{ transform:translateY(0);} }
+  .toast-in{ animation: toastIn .35s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes toastIn{ from{opacity:0; transform:translate(-50%,-10px)} to{opacity:1; transform:translate(-50%,0)} }
+  .pulse-dot{ animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:.45; transform:scale(.8);} }
+  .tap{ transition: transform .15s ease, box-shadow .15s ease, background-color .2s ease, border-color .2s ease; }
+  .tap:active{ transform: scale(.97); }
+  .glow-open{ box-shadow: 0 0 0 2px var(--success), 0 8px 24px -8px rgba(111,163,119,.45); border-color: var(--success) !important; }
+  ::-webkit-scrollbar{ width:0; height:0; }
+  input:focus{ outline:none; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+</style>
+</head>
+<body class="outer-bg min-h-[100dvh] flex items-center justify-center sm:py-8">
+
+  <div id="app" class="phone relative w-full h-[100dvh] sm:h-[844px] sm:w-[390px] sm:rounded-[2.6rem] sm:shadow-[0_30px_60px_-15px_rgba(30,35,30,0.25)] sm:border sm:border-black/5 overflow-hidden">
+
+    <!-- ===================== ЭКРАН ВХОДА ===================== -->
+    <section id="loginScreen" class="absolute inset-0 flex flex-col px-7 pt-16 pb-8">
+      <div class="flex-1 flex flex-col">
+        <div class="fade-up" style="animation-delay:.02s">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:var(--accent-soft)">
+            <i data-lucide="home" class="w-7 h-7" style="color:var(--accent-dark)"></i>
+          </div>
+        </div>
+
+        <div class="mt-8 fade-up" style="animation-delay:.08s">
+          <p class="text-sm font-semibold tracking-wide" style="color:var(--accent-dark)">ЖК «Южный квартал»</p>
+          <h1 class="text-[28px] leading-tight font-extrabold mt-2">Добро пожаловать</h1>
+          <p class="muted text-[15px] mt-2 leading-relaxed">Войдите по номеру телефона, чтобы управлять доступом и камерами вашего дома.</p>
+        </div>
+
+        <form id="loginForm" class="mt-9 space-y-4 fade-up" style="animation-delay:.14s">
+          <div>
+            <label class="text-[13px] font-medium muted ml-1">Номер телефона</label>
+            <div class="mt-1.5 card rounded-2xl px-4 py-3.5 flex items-center gap-2">
+              <i data-lucide="phone" class="w-[18px] h-[18px]" style="color:var(--text-muted)"></i>
+              <input type="tel" placeholder="+7 (___) ___-__-__" class="bg-transparent w-full text-[15px] placeholder:text-[--text-muted]">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between ml-1">
+              <label class="text-[13px] font-medium muted">СМС-код</label>
+              <button type="button" onclick="showToast('check','Код отправлен')" class="text-[13px] font-semibold" style="color:var(--accent-dark)">Получить код</button>
+            </div>
+            <div class="mt-1.5 card rounded-2xl px-4 py-3.5 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-[18px] h-[18px]" style="color:var(--text-muted)"></i>
+              <input type="text" inputmode="numeric" placeholder="• • • •" class="bg-transparent w-full text-[15px] tracking-[6px] placeholder:text-[--text-muted]">
+            </div>
+          </div>
+
+          <button type="submit" class="tap w-full rounded-2xl py-4 mt-2 font-semibold text-[15px] text-white flex items-center justify-center gap-2" style="background:var(--accent-dark)">
+            Войти
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+
+      <p class="text-center text-[12.5px] muted fade-up" style="animation-delay:.2s">Нажимая «Войти», вы соглашаетесь с условиями обслуживания</p>
+    </section>
+
+    <!-- ===================== ГЛАВНЫЙ ЭКРАН ===================== -->
+    <section id="mainScreen" class="absolute inset-0 hidden flex-col">
+
+      <!-- header -->
+      <header class="px-6 pt-14 pb-3 flex items-center justify-between shrink-0">
+        <div>
+          <p class="muted text-[13px]">Доброе утро</p>
+          <h2 class="text-[20px] font-extrabold mt-0.5">Антон Клодович</h2>
+        </div>
+        <div class="w-11 h-11 rounded-full flex items-center justify-center" style="background:var(--accent-soft)">
+          <i data-lucide="user-round" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+        </div>
+      </header>
+
+      <!-- tabs -->
+      <div class="px-6 pb-3 shrink-0">
+        <div class="card rounded-2xl p-1 flex gap-1">
+          <button id="tabBtnAccess" onclick="switchTab('access')" class="tap flex-1 py-2.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-1.5" style="background:var(--accent-dark); color:white">
+            <i data-lucide="lock-keyhole" class="w-4 h-4"></i> Доступ
+          </button>
+          <button id="tabBtnCameras" onclick="switchTab('cameras')" class="tap flex-1 py-2.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-1.5 muted">
+            <i data-lucide="camera" class="w-4 h-4"></i> Камеры
+          </button>
+        </div>
+      </div>
+
+      <!-- content -->
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pb-28">
+
+        <!-- ВКЛАДКА ДОСТУП -->
+        <div id="panelAccess" class="grid grid-cols-2 gap-3.5 pt-2">
+          <!-- cards injected by JS -->
+        </div>
+
+        <!-- ВКЛАДКА КАМЕРЫ -->
+        <div id="panelCameras" class="hidden pt-2 space-y-3">
+          <!-- cards injected by JS -->
+        </div>
+
+      </div>
+
+      <!-- bottom nav -->
+      <nav class="absolute bottom-0 left-0 right-0 px-6 pb-7 pt-3 backdrop-blur-md" style="background:linear-gradient(to top, var(--bg) 65%, transparent)">
+        <div class="card rounded-2xl flex items-center justify-around py-2.5 shadow-[0_10px_30px_-12px_rgba(30,35,30,0.18)]">
+          <button onclick="switchTab('access')" class="navbtn flex flex-col items-center gap-1 px-6 py-1" data-nav="access">
+            <i data-lucide="lock-keyhole" class="w-5 h-5"></i>
+            <span class="text-[11px] font-semibold">Доступ</span>
+          </button>
+          <button onclick="switchTab('cameras')" class="navbtn flex flex-col items-center gap-1 px-6 py-1" data-nav="cameras">
+            <i data-lucide="camera" class="w-5 h-5"></i>
+            <span class="text-[11px] font-semibold">Камеры</span>
+          </button>
+        </div>
+      </nav>
+    </section>
+
+    <!-- ===================== МОДАЛКА КАМЕРЫ ===================== -->
+    <div id="cameraModal" class="hidden absolute inset-0 z-30">
+      <div class="absolute inset-0 bg-black/40" onclick="closeCamera()"></div>
+      <div class="sheet-in absolute bottom-0 left-0 right-0 max-h-[92%] card rounded-t-[2rem] px-5 pt-4 pb-8 flex flex-col gap-4">
+        <div class="w-10 h-1.5 rounded-full bg-black/10 mx-auto"></div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 id="cameraTitle" class="font-extrabold text-[17px]">Камера (Калитка 1)</h3>
+            <p class="muted text-[13px] mt-0.5">Вызывная панель · Прямой эфир</p>
+          </div>
+          <button onclick="closeCamera()" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:var(--bg-tint)">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <!-- video stub -->
+        <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden" style="background:linear-gradient(160deg,#2b2f2c,#15171a 70%)">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <i data-lucide="video" class="w-10 h-10 text-white/25"></i>
+          </div>
+          <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-black/40 backdrop-blur px-2.5 py-1 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-red-500 pulse-dot"></span>
+            <span class="text-white text-[11px] font-bold tracking-wide">LIVE</span>
+          </div>
+          <div class="absolute top-3 right-3 bg-black/40 backdrop-blur px-2.5 py-1 rounded-full text-white text-[11px]" id="cameraClock">00:00:00</div>
+          <button onclick="togglePlay()" id="playOverlayBtn" class="absolute inset-0 flex items-center justify-center group">
+            <span class="w-14 h-14 rounded-full bg-white/15 backdrop-blur flex items-center justify-center group-active:scale-90 transition-transform">
+              <i data-lucide="pause" id="playIcon" class="w-6 h-6 text-white"></i>
+            </span>
+          </button>
+        </div>
+
+        <!-- timeline -->
+        <div>
+          <div class="h-1.5 rounded-full w-full" style="background:var(--bg-tint)">
+            <div id="timelineFill" class="h-1.5 rounded-full" style="background:var(--accent); width:72%"></div>
+          </div>
+          <div class="flex justify-between mt-1.5 text-[11.5px] muted">
+            <span>−12 ч</span>
+            <span>сейчас</span>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div class="flex items-center justify-center gap-4">
+          <button onclick="showToast('rotate-ccw','Перемотка на −10 сек')" class="tap w-12 h-12 rounded-full card flex items-center justify-center">
+            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+          </button>
+          <button onclick="togglePlay()" class="tap w-14 h-14 rounded-full flex items-center justify-center text-white" style="background:var(--accent-dark)">
+            <i data-lucide="pause" id="playIcon2" class="w-6 h-6"></i>
+          </button>
+          <button onclick="showToast('rotate-cw','Перемотка на +10 сек')" class="tap w-12 h-12 rounded-full card flex items-center justify-center">
+            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <button onclick="showToast('download','Функция доступна в полной версии')" class="tap w-full rounded-2xl py-3.5 font-semibold text-[14px] flex items-center justify-center gap-2 border" style="border-color:var(--border); color:var(--accent-dark)">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          Скачать архив за выбранный период
+        </button>
+      </div>
+    </div>
+
+    <!-- toast -->
+    <div id="toast" class="hidden toast-in absolute top-14 left-1/2 z-40 card rounded-full pl-2.5 pr-4 py-2 flex items-center gap-2 shadow-[0_12px_30px_-10px_rgba(30,35,30,0.3)]">
+      <span id="toastIconWrap" class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background:var(--success-soft)">
+        <i data-lucide="check" id="toastIcon" class="w-4 h-4" style="color:var(--success)"></i>
+      </span>
+      <span id="toastText" class="text-[13.5px] font-semibold whitespace-nowrap"></span>
+    </div>
+
+  </div>
+
+<script>
+  // ---------- data ----------
+  const accessPoints = [
+    { id:'g1', name:'Калитка 1', icon:'door-closed' },
+    { id:'g2', name:'Калитка 2', icon:'door-closed' },
+    { id:'g3', name:'Калитка 3', icon:'door-closed' },
+    { id:'g4', name:'Калитка 4', icon:'door-closed' },
+    { id:'v1', name:'Ворота 1',  icon:'square-parking' },
+    { id:'v2', name:'Ворота 2',  icon:'square-parking' },
+  ];
+  const cameras = [
+    { id:'c1', name:'Камера (Калитка 1)' },
+    { id:'c2', name:'Камера (Калитка 2)' },
+    { id:'c3', name:'Камера (Калитка 3)' },
+    { id:'c4', name:'Камера (Калитка 4)' },
+  ];
+
+  const panelAccess = document.getElementById('panelAccess');
+  const panelCameras = document.getElementById('panelCameras');
+
+  function renderAccess(){
+    panelAccess.innerHTML = accessPoints.map(p => `
+      <button onclick="openAccess('${p.id}')" id="card-${p.id}" class="tap card rounded-2xl p-4 flex flex-col items-start gap-3 text-left">
+        <span id="iconwrap-${p.id}" class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:var(--accent-soft)">
+          <i data-lucide="${p.icon}" id="icon-${p.id}" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+        </span>
+        <div>
+          <p class="font-bold text-[14.5px]">${p.name}</p>
+          <p id="status-${p.id}" class="muted text-[12.5px] mt-0.5">Нажмите, чтобы открыть</p>
+        </div>
+      </button>
+    `).join('');
+    lucide.createIcons();
+  }
+
+  function renderCameras(){
+    panelCameras.innerHTML = cameras.map(c => `
+      <button onclick="openCamera('${c.name}')" class="tap card rounded-2xl p-3 flex items-center gap-3.5 w-full text-left">
+        <div class="relative w-20 h-16 rounded-xl overflow-hidden shrink-0" style="background:linear-gradient(160deg,#3a3f3b,#181a1c 75%)">
+          <i data-lucide="camera" class="w-5 h-5 text-white/30 absolute inset-0 m-auto"></i>
+          <span class="absolute bottom-1 left-1 flex items-center gap-1 bg-black/40 px-1.5 py-[1px] rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse-dot"></span>
+            <span class="text-white text-[9px] font-bold">LIVE</span>
+          </span>
+        </div>
+        <div class="flex-1">
+          <p class="font-bold text-[14.5px]">${c.name}</p>
+          <p class="muted text-[12.5px] mt-0.5">Прямой эфир · Онлайн</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4.5 h-4.5" style="color:var(--text-muted)"></i>
+      </button>
+    `).join('');
+    lucide.createIcons();
+  }
+
+  // ---------- login ----------
+  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const login = document.getElementById('loginScreen');
+    const main = document.getElementById('mainScreen');
+    login.style.transition = 'opacity .35s ease';
+    login.style.opacity = '0';
+    setTimeout(()=>{
+      login.classList.add('hidden');
+      main.classList.remove('hidden');
+      main.classList.add('flex');
+      main.classList.add('fade-in');
+      lucide.createIcons();
+    }, 320);
+  });
+
+  // ---------- tabs ----------
+  function switchTab(tab){
+    const btnA = document.getElementById('tabBtnAccess');
+    const btnC = document.getElementById('tabBtnCameras');
+    const navBtns = document.querySelectorAll('.navbtn');
+    if(tab==='access'){
+      panelAccess.classList.remove('hidden');
+      panelCameras.classList.add('hidden');
+      btnA.style.background = 'var(--accent-dark)'; btnA.style.color='white'; btnA.classList.remove('muted');
+      btnC.style.background = 'transparent'; btnC.style.color=''; btnC.classList.add('muted');
+    } else {
+      panelCameras.classList.remove('hidden');
+      panelAccess.classList.add('hidden');
+      btnC.style.background = 'var(--accent-dark)'; btnC.style.color='white'; btnC.classList.remove('muted');
+      btnA.style.background = 'transparent'; btnA.style.color=''; btnA.classList.add('muted');
+    }
+    navBtns.forEach(b=>{
+      b.style.color = (b.dataset.nav===tab) ? 'var(--accent-dark)' : 'var(--text-muted)';
+    });
+  }
+
+  // ---------- access cards ----------
+  function openAccess(id){
+    const card = document.getElementById(`card-${id}`);
+    const icon = document.getElementById(`icon-${id}`);
+    const wrap = document.getElementById(`iconwrap-${id}`);
+    const status = document.getElementById(`status-${id}`);
+    if(card.dataset.busy) return;
+    card.dataset.busy = '1';
+
+    card.classList.add('glow-open');
+    wrap.style.background = 'var(--success-soft)';
+    icon.setAttribute('data-lucide','lock-open');
+    icon.style.color = 'var(--success)';
+    status.textContent = 'Открыто';
+    status.style.color = 'var(--success)';
+    lucide.createIcons();
+    showToast('check-circle-2','Доступ разрешён · Дверь открыта');
+
+    setTimeout(()=>{
+      card.classList.remove('glow-open');
+      wrap.style.background = 'var(--accent-soft)';
+      icon.setAttribute('data-lucide','lock-keyhole');
+      icon.style.color = 'var(--accent-dark)';
+      status.textContent = 'Нажмите, чтобы открыть';
+      status.style.color = '';
+      lucide.createIcons();
+      delete card.dataset.busy;
+    }, 3200);
+  }
+
+  // ---------- camera modal ----------
+  let playing = true;
+  let clockTimer = null;
+  function openCamera(name){
+    document.getElementById('cameraTitle').textContent = name;
+    const modal = document.getElementById('cameraModal');
+    modal.classList.remove('hidden');
+    lucide.createIcons();
+    let secs = 0;
+    clockTimer = setInterval(()=>{
+      secs++;
+      const h = String(Math.floor(secs/3600)).padStart(2,'0');
+      const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
+      const s = String(secs%60).padStart(2,'0');
+      document.getElementById('cameraClock').textContent = `${h}:${m}:${s}`;
+    },1000);
+  }
+  function closeCamera(){
+    document.getElementById('cameraModal').classList.add('hidden');
+    clearInterval(clockTimer);
+  }
+  function togglePlay(){
+    playing = !playing;
+    const iconName = playing ? 'pause' : 'play';
+    ['playIcon','playIcon2'].forEach(id=>{
+      const el = document.getElementById(id);
+      el.setAttribute('data-lucide', iconName);
+    });
+    lucide.createIcons();
+  }
+
+  // ---------- toast ----------
+  let toastTimer = null;
+  function showToast(iconName, text){
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    document.getElementById('toastText').textContent = text;
+    icon.setAttribute('data-lucide', iconName);
+    lucide.createIcons();
+    toast.classList.remove('hidden');
+    toast.style.animation = 'none'; void toast.offsetWidth; toast.style.animation = '';
+    toast.classList.add('toast-in');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toast.classList.add('hidden'), 2600);
+  }
+
+  // ---------- init ----------
+  renderAccess();
+  renderCameras();
+  lucide.createIcons();
+</script>
+</body>
+</html>
