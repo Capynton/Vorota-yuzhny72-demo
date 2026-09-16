@@ -23,6 +23,10 @@
     --success-soft:#E7F2E8;
     --amber:#C99A55;
     --amber-soft:#F5EBDC;
+    --info:#5B84BA;
+    --info-soft:#E9EFF7;
+    --clarify:#C97B55;
+    --clarify-soft:#F5E4DC;
   }
   *{ font-family:'Manrope',system-ui,sans-serif; }
   body{ background:var(--bg-tint); }
@@ -43,8 +47,9 @@
   .tap{ transition: transform .15s ease, box-shadow .15s ease, background-color .2s ease, border-color .2s ease; }
   .tap:active{ transform: scale(.97); }
   .glow-open{ box-shadow: 0 0 0 2px var(--success), 0 8px 24px -8px rgba(111,163,119,.45); border-color: var(--success) !important; }
+  .status-badge{ transition: background-color .3s ease, color .3s ease; }
   ::-webkit-scrollbar{ width:0; height:0; }
-  input:focus{ outline:none; }
+  input:focus, textarea:focus{ outline:none; }
   .no-scrollbar::-webkit-scrollbar{ display:none; }
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
 </style>
@@ -98,11 +103,9 @@
       <p class="text-center text-[12.5px] muted fade-up" style="animation-delay:.2s">Нажимая «Войти», вы соглашаетесь с условиями обслуживания</p>
     </section>
 
-    <!-- ===================== ГЛАВНЫЙ ЭКРАН ===================== -->
-    <section id="mainScreen" class="absolute inset-0 hidden flex-col">
-
-      <!-- header -->
-      <header class="px-6 pt-14 pb-3 flex items-center justify-between shrink-0">
+    <!-- ===================== ГЛАВНЫЙ ЭКРАН (ХАБ) ===================== -->
+    <section id="homeScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center justify-between shrink-0">
         <div>
           <p class="muted text-[13px]">Доброе утро</p>
           <h2 class="text-[20px] font-extrabold mt-0.5">Антон Клодович</h2>
@@ -112,8 +115,49 @@
         </div>
       </header>
 
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-5 pb-10">
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-3 fade-up" style="animation-delay:.02s">Разделы</p>
+
+        <div class="space-y-3.5">
+          <button onclick="goAccess()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.06s">
+            <span class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+              <i data-lucide="lock-keyhole" class="w-6 h-6" style="color:var(--accent-dark)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Доступ</p>
+              <p class="muted text-[13px] mt-0.5">Калитки, ворота и камеры</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+
+          <button onclick="goRequests()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.11s">
+            <span class="relative w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--amber-soft)">
+              <i data-lucide="message-square-text" class="w-6 h-6" style="color:var(--amber)"></i>
+              <span id="homeReqBadge" class="hidden absolute -top-1.5 -right-1.5 min-w-[19px] h-[19px] px-1 rounded-full text-[10.5px] font-bold text-white items-center justify-center" style="background:var(--amber)">0</span>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Обращение в УК</p>
+              <p class="muted text-[13px] mt-0.5" id="homeRequestsSubtitle">Создать обращение и следить за его выполнением</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН ДОСТУПА ===================== -->
+    <section id="mainScreen" class="absolute inset-0 hidden flex-col">
+
+      <!-- header -->
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="goHome()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Доступ</h2>
+      </header>
+
       <!-- tabs -->
-      <div class="px-6 pb-3 shrink-0">
+      <div class="px-6 pb-3 pt-2 shrink-0">
         <div class="card rounded-2xl p-1 flex gap-1">
           <button id="tabBtnAccess" onclick="switchTab('access')" class="tap flex-1 py-2.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-1.5" style="background:var(--accent-dark); color:white">
             <i data-lucide="lock-keyhole" class="w-4 h-4"></i> Доступ
@@ -152,6 +196,29 @@
           </button>
         </div>
       </nav>
+    </section>
+
+    <!-- ===================== ЭКРАН «ОБРАЩЕНИЕ В УК» ===================== -->
+    <section id="requestsScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="goHome()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Обращение в УК</h2>
+      </header>
+
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-3 pb-10">
+        <button onclick="openNewTicket()" class="tap w-full rounded-2xl py-3.5 mb-5 font-semibold text-[14.5px] text-white flex items-center justify-center gap-2 fade-up" style="background:var(--accent-dark)">
+          <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+          Новое обращение
+        </button>
+
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-2.5 fade-up" style="animation-delay:.04s">Мои обращения</p>
+
+        <div id="ticketsList" class="space-y-3">
+          <!-- injected by JS -->
+        </div>
+      </div>
     </section>
 
     <!-- ===================== МОДАЛКА КАМЕРЫ ===================== -->
@@ -218,6 +285,103 @@
       </div>
     </div>
 
+    <!-- ===================== МОДАЛКА ОБРАЩЕНИЯ (ПРОСМОТР) ===================== -->
+    <div id="ticketModal" class="hidden absolute inset-0 z-30">
+      <div class="absolute inset-0 bg-black/40" onclick="closeTicket()"></div>
+      <div class="sheet-in absolute bottom-0 left-0 right-0 max-h-[92%] card rounded-t-[2rem] px-5 pt-4 pb-8 flex flex-col gap-5 overflow-y-auto no-scrollbar">
+        <div class="w-10 h-1.5 rounded-full bg-black/10 mx-auto shrink-0"></div>
+
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="muted text-[12.5px] font-semibold" id="ticketModalNumber">Обращение № 00000</p>
+            <h3 class="font-extrabold text-[18px] mt-0.5 leading-snug" id="ticketModalTitle">—</h3>
+            <p class="muted text-[12.5px] mt-1.5" id="ticketModalCreated">Создано: —</p>
+          </div>
+          <button onclick="closeTicket()" class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:var(--bg-tint)">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="ticketModalStatus" class="status-badge text-[12.5px] font-bold px-3 py-1.5 rounded-full">Статус</span>
+          <span id="ticketModalCategory" class="text-[12.5px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" style="background:var(--bg-tint); color:var(--text-muted)">
+            <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+            <span id="ticketModalCategoryText">—</span>
+          </span>
+        </div>
+
+        <div>
+          <p class="text-[13px] font-bold mb-1.5">Описание</p>
+          <p class="text-[14px] leading-relaxed" id="ticketModalDesc">—</p>
+        </div>
+
+        <div id="ticketAttachmentsWrap"></div>
+
+        <div>
+          <p class="text-[13px] font-bold mb-3">Обработка обращения</p>
+          <div id="ticketTimeline"></div>
+        </div>
+
+        <div id="ticketProcessingWrap" class="hidden rounded-2xl p-3.5 items-center gap-2.5" style="background:var(--success-soft)">
+          <i data-lucide="timer" class="w-4.5 h-4.5" style="color:var(--success)"></i>
+          <p class="text-[13px] font-semibold" style="color:var(--success)">Время обработки: <span id="ticketProcessingTime"></span></p>
+        </div>
+
+        <div id="ticketCommentsWrap">
+          <p class="text-[13px] font-bold mb-2.5">Комментарии УК</p>
+          <div id="ticketComments" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== МОДАЛКА НОВОГО ОБРАЩЕНИЯ ===================== -->
+    <div id="newTicketModal" class="hidden absolute inset-0 z-30">
+      <div class="absolute inset-0 bg-black/40" onclick="closeNewTicket()"></div>
+      <div class="sheet-in absolute bottom-0 left-0 right-0 max-h-[92%] card rounded-t-[2rem] px-5 pt-4 pb-8 flex flex-col gap-4 overflow-y-auto no-scrollbar">
+        <div class="w-10 h-1.5 rounded-full bg-black/10 mx-auto shrink-0"></div>
+
+        <div class="flex items-center justify-between shrink-0">
+          <h3 class="font-extrabold text-[17px]">Новое обращение</h3>
+          <button onclick="closeNewTicket()" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:var(--bg-tint)">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <div>
+          <p class="text-[13px] font-medium muted mb-2 ml-1">Тема / категория обращения</p>
+          <div id="categoryGrid" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <div>
+          <p class="text-[13px] font-medium muted mb-1.5 ml-1">Описание проблемы</p>
+          <textarea id="newTicketDesc" rows="4" placeholder="Опишите, что случилось..." class="card rounded-2xl px-4 py-3 w-full text-[14.5px] resize-none placeholder:text-[--text-muted]"></textarea>
+        </div>
+
+        <div>
+          <p class="text-[13px] font-medium muted mb-1.5 ml-1">Файлы</p>
+          <div class="flex gap-2.5">
+            <button type="button" onclick="document.getElementById('photoInput').click()" class="tap flex-1 card rounded-2xl py-3 flex flex-col items-center gap-1.5">
+              <i data-lucide="image-plus" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+              <span class="text-[12.5px] font-semibold">Фото</span>
+            </button>
+            <button type="button" onclick="document.getElementById('videoInput').click()" class="tap flex-1 card rounded-2xl py-3 flex flex-col items-center gap-1.5">
+              <i data-lucide="video" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+              <span class="text-[12.5px] font-semibold">Видео</span>
+            </button>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" multiple class="hidden" onchange="handleFiles(this.files,'photo'); this.value='';">
+          <input type="file" id="videoInput" accept="video/*" multiple class="hidden" onchange="handleFiles(this.files,'video'); this.value='';">
+
+          <div id="newTicketFiles" class="grid grid-cols-4 gap-2 mt-3"></div>
+        </div>
+
+        <button onclick="submitNewTicket()" class="tap w-full rounded-2xl py-4 mt-1 font-semibold text-[15px] text-white flex items-center justify-center gap-2 shrink-0" style="background:var(--accent-dark)">
+          Отправить обращение
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- toast -->
     <div id="toast" class="hidden toast-in absolute top-14 left-1/2 z-40 card rounded-full pl-2.5 pr-4 py-2 flex items-center gap-2 shadow-[0_12px_30px_-10px_rgba(30,35,30,0.3)]">
       <span id="toastIconWrap" class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background:var(--success-soft)">
@@ -229,7 +393,7 @@
   </div>
 
 <script>
-  // ---------- data ----------
+  // ---------- data: доступ ----------
   const accessPoints = [
     { id:'g1', name:'Калитка 1', icon:'door-closed' },
     { id:'g2', name:'Калитка 2', icon:'door-closed' },
@@ -287,19 +451,39 @@
   document.getElementById('loginForm').addEventListener('submit', (e)=>{
     e.preventDefault();
     const login = document.getElementById('loginScreen');
-    const main = document.getElementById('mainScreen');
+    const home = document.getElementById('homeScreen');
     login.style.transition = 'opacity .35s ease';
     login.style.opacity = '0';
     setTimeout(()=>{
       login.classList.add('hidden');
-      main.classList.remove('hidden');
-      main.classList.add('flex');
-      main.classList.add('fade-in');
+      home.classList.remove('hidden');
+      home.classList.add('flex');
+      home.classList.add('fade-in');
+      updateHomeStats();
       lucide.createIcons();
     }, 320);
   });
 
-  // ---------- tabs ----------
+  // ---------- навигация между разделами ----------
+  function showScreen(id){
+    ['homeScreen','mainScreen','requestsScreen'].forEach(s=>{
+      const el = document.getElementById(s);
+      if(s===id){
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+        el.classList.add('fade-in');
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    });
+  }
+  function goHome(){ showScreen('homeScreen'); updateHomeStats(); lucide.createIcons(); }
+  function goAccess(){ showScreen('mainScreen'); switchTab('access'); lucide.createIcons(); }
+  function goRequests(){ showScreen('requestsScreen'); renderTickets(); lucide.createIcons(); }
+
+  // ---------- tabs (доступ/камеры) ----------
   function switchTab(tab){
     const btnA = document.getElementById('tabBtnAccess');
     const btnC = document.getElementById('tabBtnCameras');
@@ -396,9 +580,438 @@
     toastTimer = setTimeout(()=> toast.classList.add('hidden'), 2600);
   }
 
+  // ==================================================================
+  // ===================  ОБРАЩЕНИЕ В УК  ============================
+  // ==================================================================
+
+  const monthsRu = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  function formatDate(d){ return `${d.getDate()} ${monthsRu[d.getMonth()]}`; }
+  function formatTime(d){ return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+  function pluralize(n, one, few, many){
+    const mod10 = n % 10, mod100 = n % 100;
+    if(mod10===1 && mod100!==11) return one;
+    if([2,3,4].includes(mod10) && ![12,13,14].includes(mod100)) return few;
+    return many;
+  }
+
+  const statusMeta = {
+    new:        { label:'Новое',              color:'var(--info)',       soft:'var(--info-soft)' },
+    seen:       { label:'Просмотрено',        color:'var(--text-muted)', soft:'var(--bg-tint)' },
+    inprogress: { label:'В работе',           color:'var(--amber)',      soft:'var(--amber-soft)' },
+    clarify:    { label:'Ожидает уточнения',  color:'var(--clarify)',    soft:'var(--clarify-soft)' },
+    done:       { label:'Выполнено',          color:'var(--success)',    soft:'var(--success-soft)' },
+  };
+
+  const categories = [
+    { id:'housing',  label:'Содержание дома',        icon:'home' },
+    { id:'water',    label:'Водоснабжение',          icon:'droplet' },
+    { id:'heating',  label:'Отопление',               icon:'flame' },
+    { id:'electric', label:'Электрика',                icon:'zap' },
+    { id:'elevator', label:'Лифты',                    icon:'arrow-up-down' },
+    { id:'cleaning', label:'Уборка',                   icon:'sparkles' },
+    { id:'territory',label:'Придомовая территория',    icon:'trees' },
+    { id:'security', label:'Безопасность',             icon:'shield' },
+    { id:'other',    label:'Другое',                   icon:'more-horizontal' },
+  ];
+
+  // ---------- демонстрационные обращения ----------
+  let ticketsData = [
+    {
+      id:'00128',
+      title:'Не работает освещение в подъезде',
+      description:'В подъезде №2 на 3 и 4 этаже с вечера не горит свет на лестничной клетке. Пользоваться лестницей вечером небезопасно.',
+      category:'Электрика', categoryIcon:'zap',
+      status:'inprogress',
+      created:{date:'16 сентября', time:'18:42'},
+      updated:{date:'16 сентября', time:'19:20'},
+      attachments:[{type:'photo'},{type:'photo'}],
+      timeline:[
+        {label:'Обращение создано', date:'16 сентября, 18:42', state:'done'},
+        {label:'Обращение просмотрено УК', date:'16 сентября, 19:05', state:'done'},
+        {label:'Передано в работу', date:'16 сентября, 19:20', state:'active'},
+        {label:'Выполнено', date:null, state:'pending'},
+      ],
+      comments:[
+        {text:'Специалист направлен. Освещение будет проверено сегодня.', date:'16 сентября, 19:22'}
+      ],
+      processing:null
+    },
+    {
+      id:'00127',
+      title:'Проблема с горячей водой',
+      description:'Слабый напор горячей воды и она недостаточно горячая уже второй день, кв. 54.',
+      category:'Водоснабжение', categoryIcon:'droplet',
+      status:'seen',
+      created:{date:'16 сентября', time:'09:12'},
+      updated:{date:'16 сентября', time:'09:40'},
+      attachments:[],
+      timeline:[
+        {label:'Обращение создано', date:'16 сентября, 09:12', state:'done'},
+        {label:'Обращение просмотрено УК', date:'16 сентября, 09:40', state:'active'},
+        {label:'Передано в работу', date:null, state:'pending'},
+        {label:'Выполнено', date:null, state:'pending'},
+      ],
+      comments:[],
+      processing:null
+    },
+    {
+      id:'00122',
+      title:'Скрипит дверь в лифтовом холле',
+      description:'На 1 этаже сильно скрипит доводчик двери лифтового холла, слышно во всех квартирах рядом.',
+      category:'Лифты', categoryIcon:'arrow-up-down',
+      status:'clarify',
+      created:{date:'15 сентября', time:'12:30'},
+      updated:{date:'15 сентября', time:'14:10'},
+      attachments:[],
+      timeline:[
+        {label:'Обращение создано', date:'15 сентября, 12:30', state:'done'},
+        {label:'Обращение просмотрено УК', date:'15 сентября, 12:55', state:'done'},
+        {label:'Ожидает уточнения', date:'15 сентября, 14:10', state:'active'},
+        {label:'Выполнено', date:null, state:'pending'},
+      ],
+      comments:[
+        {text:'Уточните, пожалуйста, номер подъезда и этаж, где слышен скрип.', date:'15 сентября, 14:10'}
+      ],
+      processing:null
+    },
+    {
+      id:'00119',
+      title:'Уборка территории',
+      description:'После вчерашнего ветра во дворе много листьев и мусора, просьба провести уборку.',
+      category:'Уборка', categoryIcon:'sparkles',
+      status:'done',
+      created:{date:'14 сентября', time:'08:15'},
+      updated:{date:'14 сентября', time:'16:20'},
+      attachments:[{type:'photo'}],
+      timeline:[
+        {label:'Обращение создано', date:'14 сентября, 08:15', state:'done'},
+        {label:'Обращение просмотрено УК', date:'14 сентября, 08:45', state:'done'},
+        {label:'Передано в работу', date:'14 сентября, 09:30', state:'done'},
+        {label:'Выполнено', date:'14 сентября, 16:20', state:'done'},
+      ],
+      comments:[
+        {text:'Заявка принята, территория будет убрана в течение дня.', date:'14 сентября, 08:47'},
+        {text:'Уборка выполнена, придомовая территория приведена в порядок.', date:'14 сентября, 16:20'}
+      ],
+      processing:'8 ч 05 мин'
+    },
+    {
+      id:'00131',
+      title:'Повреждение элемента благоустройства',
+      description:'Сломана лавочка возле детской площадки — треснула одна из досок сиденья.',
+      category:'Придомовая территория', categoryIcon:'trees',
+      status:'new',
+      created:{date:'16 сентября', time:'20:05'},
+      updated:{date:'16 сентября', time:'20:05'},
+      attachments:[{type:'photo'}],
+      timeline:[
+        {label:'Обращение создано', date:'16 сентября, 20:05', state:'active'},
+        {label:'Обращение просмотрено УК', date:null, state:'pending'},
+        {label:'Передано в работу', date:null, state:'pending'},
+        {label:'Выполнено', date:null, state:'pending'},
+      ],
+      comments:[],
+      processing:null
+    },
+  ];
+  let ticketCounter = 131;
+
+  const ticketsList = document.getElementById('ticketsList');
+
+  function renderTickets(){
+    if(ticketsData.length === 0){
+      ticketsList.innerHTML = `
+        <div class="card rounded-2xl p-6 flex flex-col items-center text-center gap-2 fade-up">
+          <i data-lucide="inbox" class="w-7 h-7" style="color:var(--text-muted)"></i>
+          <p class="font-semibold text-[14px]">Обращений пока нет</p>
+          <p class="muted text-[12.5px]">Создайте новое обращение — и оно появится здесь</p>
+        </div>`;
+      lucide.createIcons();
+      return;
+    }
+    ticketsList.innerHTML = ticketsData.map((t,i) => {
+      const meta = statusMeta[t.status];
+      return `
+      <button onclick="openTicket('${t.id}')" class="tap card rounded-2xl p-4 w-full text-left flex flex-col gap-2.5 fade-up" style="animation-delay:${Math.min(i*0.05,0.3)}s">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+              <i data-lucide="${t.categoryIcon}" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="font-bold text-[14.5px] leading-snug truncate">${escapeHtml(t.title)}</p>
+              <p class="muted text-[12px] mt-0.5">№ ${t.id} · ${t.created.date}, ${t.created.time}</p>
+            </div>
+          </div>
+          <span class="status-badge shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap" style="background:${meta.soft}; color:${meta.color}">${meta.label}</span>
+        </div>
+        <div class="flex items-center justify-between mt-0.5 pl-0.5">
+          <p class="muted text-[11.5px] flex items-center gap-1">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i> Обновлено ${t.updated.date}, ${t.updated.time}
+          </p>
+          <div class="flex items-center gap-2.5 shrink-0">
+            ${t.attachments.length ? `<span class="muted text-[11.5px] flex items-center gap-1"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i>${t.attachments.length}</span>` : ''}
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color:var(--text-muted)"></i>
+          </div>
+        </div>
+      </button>`;
+    }).join('');
+    lucide.createIcons();
+  }
+
+  function updateHomeStats(){
+    const active = ticketsData.filter(t => t.status !== 'done').length;
+    const subtitle = document.getElementById('homeRequestsSubtitle');
+    const badge = document.getElementById('homeReqBadge');
+    if(active > 0){
+      subtitle.textContent = `${active} ${pluralize(active,'активное обращение','активных обращения','активных обращений')}`;
+      badge.textContent = active;
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
+    } else {
+      subtitle.textContent = 'Создать обращение и следить за его выполнением';
+      badge.classList.add('hidden');
+      badge.classList.remove('flex');
+    }
+  }
+
+  // ---------- вложения ----------
+  function renderAttachments(atts){
+    if(!atts || atts.length === 0) return '';
+    return `
+      <div>
+        <p class="text-[13px] font-bold mb-2.5">Вложения</p>
+        <div class="grid grid-cols-3 gap-2">
+          ${atts.map(a => a.type === 'photo' ? `
+            <div class="relative aspect-square rounded-xl overflow-hidden" style="${a.url ? '' : 'background:linear-gradient(160deg,#3a3f3b,#181a1c 75%)'}">
+              ${a.url
+                ? `<img src="${a.url}" class="w-full h-full object-cover">`
+                : `<i data-lucide="image" class="w-5 h-5 text-white/30 absolute inset-0 m-auto"></i>`}
+            </div>
+          ` : `
+            <button type="button" onclick="toggleAttachVideo(this)" class="relative aspect-square rounded-xl overflow-hidden flex items-center justify-center" style="background:linear-gradient(160deg,#2b2f2c,#15171a 70%)">
+              ${a.url ? `<video class="absolute inset-0 w-full h-full object-cover" src="${a.url}" muted playsinline loop></video>` : `<i data-lucide="video" class="w-5 h-5 text-white/30 absolute inset-0 m-auto"></i>`}
+              <span class="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center pointer-events-none">
+                <i data-lucide="play" class="playIcon w-4 h-4 text-white"></i>
+              </span>
+            </button>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  function toggleAttachVideo(btn){
+    const video = btn.querySelector('video');
+    const icon = btn.querySelector('.playIcon');
+    if(!video) { showToast('info','Видео недоступно в демо-режиме'); return; }
+    if(video.paused){
+      video.play();
+      icon.setAttribute('data-lucide','pause');
+    } else {
+      video.pause();
+      icon.setAttribute('data-lucide','play');
+    }
+    lucide.createIcons();
+  }
+
+  // ---------- timeline обращения ----------
+  function renderTimelineStep(step, isLast){
+    const isDone = step.state === 'done';
+    const isActive = step.state === 'active';
+    const circleBg = isDone ? 'var(--success)' : isActive ? 'var(--accent-dark)' : 'var(--bg-tint)';
+    const circleColor = (isDone || isActive) ? '#fff' : 'var(--text-muted)';
+    const border = (isDone || isActive) ? 'none' : '1px solid var(--border)';
+    const iconHtml = isDone
+      ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>'
+      : isActive
+        ? '<span class="w-2 h-2 rounded-full block" style="background:white"></span>'
+        : '';
+    return `
+      <div class="flex gap-3">
+        <div class="flex flex-col items-center">
+          <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${isActive ? 'pulse-dot' : ''}" style="background:${circleBg}; color:${circleColor}; border:${border}">
+            ${iconHtml}
+          </span>
+          ${!isLast ? `<span class="w-[2px] flex-1 my-0.5" style="background:${isDone ? 'var(--success)' : 'var(--border)'}; min-height:18px;"></span>` : ''}
+        </div>
+        <div class="${isLast ? '' : 'pb-5'} flex-1">
+          <p class="font-semibold text-[13.5px]" style="color:${(isDone || isActive) ? 'var(--text)' : 'var(--text-muted)'}">${step.label}</p>
+          <p class="muted text-[12px] mt-0.5">${step.date || '—'}</p>
+        </div>
+      </div>`;
+  }
+
+  // ---------- модалка просмотра обращения ----------
+  function openTicket(id){
+    const t = ticketsData.find(x => x.id === id);
+    if(!t) return;
+    const meta = statusMeta[t.status];
+
+    document.getElementById('ticketModalNumber').textContent = `Обращение № ${t.id}`;
+    document.getElementById('ticketModalTitle').textContent = t.title;
+    document.getElementById('ticketModalCreated').textContent = `Создано: ${t.created.date}, ${t.created.time}`;
+    document.getElementById('ticketModalDesc').textContent = t.description || 'Описание не указано.';
+    document.getElementById('ticketModalCategoryText').textContent = t.category;
+
+    const statusEl = document.getElementById('ticketModalStatus');
+    statusEl.textContent = meta.label;
+    statusEl.style.background = meta.soft;
+    statusEl.style.color = meta.color;
+
+    document.getElementById('ticketTimeline').innerHTML = t.timeline.map((step,i) => renderTimelineStep(step, i === t.timeline.length - 1)).join('');
+    document.getElementById('ticketAttachmentsWrap').innerHTML = renderAttachments(t.attachments);
+
+    const commentsWrap = document.getElementById('ticketCommentsWrap');
+    const commentsEl = document.getElementById('ticketComments');
+    if(t.comments && t.comments.length){
+      commentsWrap.classList.remove('hidden');
+      commentsEl.innerHTML = t.comments.map(c => `
+        <div class="rounded-2xl p-3.5" style="background:var(--accent-soft)">
+          <p class="text-[13.5px] leading-relaxed">${escapeHtml(c.text)}</p>
+          <p class="muted text-[11.5px] mt-1.5">${c.date}</p>
+        </div>`).join('');
+    } else {
+      commentsWrap.classList.add('hidden');
+    }
+
+    const procWrap = document.getElementById('ticketProcessingWrap');
+    if(t.processing){
+      procWrap.classList.remove('hidden');
+      procWrap.classList.add('flex');
+      document.getElementById('ticketProcessingTime').textContent = t.processing;
+    } else {
+      procWrap.classList.add('hidden');
+      procWrap.classList.remove('flex');
+    }
+
+    document.getElementById('ticketModal').classList.remove('hidden');
+    lucide.createIcons();
+  }
+  function closeTicket(){
+    document.getElementById('ticketModal').classList.add('hidden');
+  }
+
+  // ---------- модалка нового обращения ----------
+  let newTicketState = { categoryId:null, files:[] };
+
+  function renderCategoryGrid(){
+    document.getElementById('categoryGrid').innerHTML = categories.map(c => `
+      <button type="button" onclick="selectCategory('${c.id}')" id="cat-${c.id}" class="tap card rounded-2xl py-3 px-1.5 flex flex-col items-center gap-1.5 text-center">
+        <i data-lucide="${c.icon}" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+        <span class="text-[10.5px] font-semibold leading-tight">${c.label}</span>
+      </button>`).join('');
+    lucide.createIcons();
+  }
+
+  function selectCategory(id){
+    newTicketState.categoryId = id;
+    categories.forEach(c => {
+      const el = document.getElementById(`cat-${c.id}`);
+      if(c.id === id){
+        el.style.borderColor = 'var(--accent-dark)';
+        el.style.background = 'var(--accent-soft)';
+      } else {
+        el.style.borderColor = '';
+        el.style.background = '';
+      }
+    });
+  }
+
+  function handleFiles(fileList, type){
+    Array.from(fileList).forEach(file => {
+      const url = URL.createObjectURL(file);
+      newTicketState.files.push({ type, url, name:file.name });
+    });
+    renderNewTicketFiles();
+    showToast('paperclip', type === 'photo' ? 'Фото добавлено' : 'Видео добавлено');
+  }
+
+  function renderNewTicketFiles(){
+    const wrap = document.getElementById('newTicketFiles');
+    wrap.innerHTML = newTicketState.files.map((f,i) => f.type === 'photo' ? `
+      <div class="relative aspect-square rounded-xl overflow-hidden fade-in">
+        <img src="${f.url}" class="w-full h-full object-cover">
+        <button type="button" onclick="removeFile(${i})" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center">
+          <i data-lucide="x" class="w-3 h-3 text-white"></i>
+        </button>
+      </div>
+    ` : `
+      <div class="relative aspect-square rounded-xl overflow-hidden fade-in flex items-center justify-center" style="background:linear-gradient(160deg,#2b2f2c,#15171a 70%)">
+        <i data-lucide="video" class="w-5 h-5 text-white/40"></i>
+        <button type="button" onclick="removeFile(${i})" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center">
+          <i data-lucide="x" class="w-3 h-3 text-white"></i>
+        </button>
+      </div>
+    `).join('');
+    lucide.createIcons();
+  }
+
+  function removeFile(i){
+    newTicketState.files.splice(i,1);
+    renderNewTicketFiles();
+  }
+
+  function openNewTicket(){
+    newTicketState = { categoryId:null, files:[] };
+    document.getElementById('newTicketDesc').value = '';
+    renderCategoryGrid();
+    renderNewTicketFiles();
+    document.getElementById('newTicketModal').classList.remove('hidden');
+    lucide.createIcons();
+  }
+  function closeNewTicket(){
+    document.getElementById('newTicketModal').classList.add('hidden');
+  }
+
+  function submitNewTicket(){
+    const desc = document.getElementById('newTicketDesc').value.trim();
+    if(!newTicketState.categoryId){ showToast('alert-circle','Выберите категорию обращения'); return; }
+    if(!desc){ showToast('alert-circle','Опишите проблему'); return; }
+
+    const cat = categories.find(c => c.id === newTicketState.categoryId);
+    const now = new Date();
+    const dateStr = formatDate(now);
+    const timeStr = formatTime(now);
+    ticketCounter++;
+    const newId = String(ticketCounter).padStart(5,'0');
+
+    const ticket = {
+      id:newId,
+      title: desc.length > 60 ? desc.slice(0,60) + '…' : desc,
+      description: desc,
+      category: cat.label,
+      categoryIcon: cat.icon,
+      status:'new',
+      created:{date:dateStr, time:timeStr},
+      updated:{date:dateStr, time:timeStr},
+      attachments: newTicketState.files.map(f => ({ type:f.type, url:f.url })),
+      timeline:[
+        {label:'Обращение создано', date:`${dateStr}, ${timeStr}`, state:'active'},
+        {label:'Обращение просмотрено УК', date:null, state:'pending'},
+        {label:'Передано в работу', date:null, state:'pending'},
+        {label:'Выполнено', date:null, state:'pending'},
+      ],
+      comments:[],
+      processing:null
+    };
+
+    ticketsData.unshift(ticket);
+    closeNewTicket();
+    renderTickets();
+    updateHomeStats();
+    setTimeout(()=> showToast('check-circle-2','Обращение отправлено'), 380);
+  }
+
   // ---------- init ----------
   renderAccess();
   renderCameras();
+  renderTickets();
+  updateHomeStats();
   lucide.createIcons();
 </script>
 </body>
