@@ -172,7 +172,7 @@
       <div class="flex-1 overflow-y-auto no-scrollbar px-6 pb-28">
 
         <!-- ВКЛАДКА ДОСТУП -->
-        <div id="panelAccess" class="grid grid-cols-2 gap-3.5 pt-2">
+        <div id="panelAccess" class="grid grid-cols-2 gap-2 pt-2">
           <!-- cards injected by JS -->
         </div>
 
@@ -414,13 +414,13 @@
 
   function renderAccess(){
     panelAccess.innerHTML = accessPoints.map(p => `
-      <button onclick="openAccess('${p.id}')" id="card-${p.id}" class="tap card rounded-2xl p-4 flex flex-col items-start gap-3 text-left">
-        <span id="iconwrap-${p.id}" class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:var(--accent-soft)">
-          <i data-lucide="${p.icon}" id="icon-${p.id}" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+      <button onclick="openAccess('${p.id}')" id="card-${p.id}" class="tap card rounded-2xl p-2.5 flex flex-col items-start gap-1.5 text-left">
+        <span id="iconwrap-${p.id}" class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:var(--accent-soft)">
+          <i data-lucide="${p.icon}" id="icon-${p.id}" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
         </span>
         <div>
-          <p class="font-bold text-[14.5px]">${p.name}</p>
-          <p id="status-${p.id}" class="muted text-[12.5px] mt-0.5">Нажмите, чтобы открыть</p>
+          <p class="font-bold text-[13.5px]">${p.name}</p>
+          <p id="status-${p.id}" class="muted text-[10.5px] mt-0.5">Нажмите, чтобы открыть</p>
         </div>
       </button>
     `).join('');
