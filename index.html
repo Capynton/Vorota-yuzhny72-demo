@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Резиденция — приложение жителя</title>
+<title>ЖК Южный квартал</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,6 +27,8 @@
     --info-soft:#E9EFF7;
     --clarify:#C97B55;
     --clarify-soft:#F5E4DC;
+    --danger:#D9604A;
+    --danger-soft:#F8E1DA;
   }
   *{ font-family:'Manrope',system-ui,sans-serif; }
   body{ background:var(--bg-tint); }
@@ -52,6 +54,10 @@
   input:focus, textarea:focus{ outline:none; }
   .no-scrollbar::-webkit-scrollbar{ display:none; }
   .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+  .line-clamp-2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .ring-pulse{ animation: ringPulse 1.4s ease-in-out infinite; }
+  @keyframes ringPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(217,96,74,.35);} 50%{ box-shadow:0 0 0 10px rgba(217,96,74,0);} }
+  .bubble-in{ animation: fadeUp .3s cubic-bezier(.2,.8,.3,1) both; }
 </style>
 </head>
 <body class="outer-bg min-h-[100dvh] flex items-center justify-center sm:py-8">
@@ -110,8 +116,14 @@
           <p class="muted text-[13px]">Доброе утро</p>
           <h2 class="text-[20px] font-extrabold mt-0.5">Антон Клодович</h2>
         </div>
-        <div class="w-11 h-11 rounded-full flex items-center justify-center" style="background:var(--accent-soft)">
-          <i data-lucide="user-round" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="openEmergency()" class="tap ring-pulse flex items-center gap-1.5 pl-2.5 pr-3 py-2.5 rounded-full" style="background:var(--danger-soft)">
+            <i data-lucide="triangle-alert" class="w-4 h-4" style="color:var(--danger)"></i>
+            <span class="text-[11.5px] font-bold" style="color:var(--danger)">Диспетчер</span>
+          </button>
+          <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+            <i data-lucide="user-round" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+          </div>
         </div>
       </header>
 
@@ -130,6 +142,17 @@
             <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
           </button>
 
+          <button onclick="goCameras()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.085s">
+            <span class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--info-soft)">
+              <i data-lucide="camera" class="w-6 h-6" style="color:var(--info)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Камеры</p>
+              <p class="muted text-[13px] mt-0.5">Просмотр камер домов и ворот</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+
           <button onclick="goRequests()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.11s">
             <span class="relative w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--amber-soft)">
               <i data-lucide="message-square-text" class="w-6 h-6" style="color:var(--amber)"></i>
@@ -138,6 +161,31 @@
             <div class="flex-1 min-w-0">
               <p class="font-extrabold text-[16.5px]">Обращение в УК</p>
               <p class="muted text-[13px] mt-0.5" id="homeRequestsSubtitle">Создать обращение и следить за его выполнением</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+        </div>
+
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-3 mt-6 fade-up" style="animation-delay:.13s">Информация</p>
+        <div class="space-y-3.5">
+          <button onclick="goNews()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.15s">
+            <span class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--success-soft)">
+              <i data-lucide="megaphone" class="w-6 h-6" style="color:var(--success)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Новости УК</p>
+              <p class="muted text-[13px] mt-0.5">Сообщения и уведомления от управляющей компании</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+
+          <button onclick="goChat()" class="tap card rounded-3xl p-5 w-full text-left flex items-center gap-4 fade-up" style="animation-delay:.19s">
+            <span class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+              <i data-lucide="messages-square" class="w-6 h-6" style="color:var(--accent-dark)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Чат с УК</p>
+              <p class="muted text-[13px] mt-0.5">Написать управляющей компании напрямую</p>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color:var(--text-muted)"></i>
           </button>
@@ -220,6 +268,166 @@
         </div>
       </div>
     </section>
+
+    <!-- ===================== ЭКРАН «КАМЕРЫ» (СПИСОК ОБЪЕКТОВ) ===================== -->
+    <section id="camerasScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="goHome()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Камеры</h2>
+      </header>
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-3 pb-10">
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-2.5 fade-up" style="animation-delay:.02s">Объекты</p>
+        <div id="cameraHousesList" class="space-y-2.5">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН «КАМЕРЫ ДОМА» ===================== -->
+    <section id="houseCamerasScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="backToCameras()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Дом <span id="houseCamerasTitle"></span></h2>
+      </header>
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-3 pb-10">
+        <div id="houseCamerasContent" class="space-y-3">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН «ВОРОТА» ===================== -->
+    <section id="gatesScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="backFromGates()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Ворота</h2>
+      </header>
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-3 pb-10">
+        <div id="gatesList" class="space-y-3">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН «НОВОСТИ УК» ===================== -->
+    <section id="newsScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="goHome()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Новости УК</h2>
+      </header>
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-3 pb-10">
+        <div id="newsList" class="space-y-3">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН «ЧАТ С УК» ===================== -->
+    <section id="chatScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="goHome()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+            <i data-lucide="building-2" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+          </span>
+          <div class="min-w-0">
+            <h2 class="text-[16px] font-extrabold leading-tight truncate">Чат с УК</h2>
+            <p class="muted text-[11px]">Обычно отвечают в течение часа</p>
+          </div>
+        </div>
+      </header>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto no-scrollbar px-5 pt-3 pb-3 space-y-2.5"></div>
+
+      <div class="relative px-4 pb-7 pt-2 shrink-0" style="background:linear-gradient(to top, var(--bg) 70%, transparent)">
+        <div id="chatAttachSheet" class="hidden absolute bottom-[62px] left-4 card rounded-2xl p-2 flex gap-1 shadow-[0_10px_30px_-12px_rgba(30,35,30,0.25)] fade-up">
+          <button onclick="chatPickFile('photo')" class="tap flex flex-col items-center gap-1 px-3 py-2 rounded-xl">
+            <i data-lucide="image" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+            <span class="text-[10.5px] font-semibold">Фото</span>
+          </button>
+          <button onclick="chatPickFile('video')" class="tap flex flex-col items-center gap-1 px-3 py-2 rounded-xl">
+            <i data-lucide="video" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+            <span class="text-[10.5px] font-semibold">Видео</span>
+          </button>
+          <button onclick="chatPickFile('doc')" class="tap flex flex-col items-center gap-1 px-3 py-2 rounded-xl">
+            <i data-lucide="file-text" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i>
+            <span class="text-[10.5px] font-semibold">Документ</span>
+          </button>
+        </div>
+        <input type="file" id="chatPhotoInput" accept="image/*" class="hidden" onchange="handleChatFile(this.files,'photo'); this.value='';">
+        <input type="file" id="chatVideoInput" accept="video/*" class="hidden" onchange="handleChatFile(this.files,'video'); this.value='';">
+        <input type="file" id="chatDocInput" accept=".pdf,.doc,.docx" class="hidden" onchange="handleChatFile(this.files,'doc'); this.value='';">
+
+        <div class="card rounded-full flex items-center gap-1.5 pl-1.5 pr-1.5 py-1.5">
+          <button onclick="toggleChatAttach()" class="tap w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:var(--bg-tint)">
+            <i data-lucide="paperclip" class="w-4.5 h-4.5"></i>
+          </button>
+          <input id="chatInput" type="text" placeholder="Сообщение..." class="bg-transparent flex-1 text-[14px] min-w-0 placeholder:text-[--text-muted]" onkeydown="if(event.key==='Enter'){sendChatMessage();}">
+          <button onclick="sendChatMessage()" class="tap w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white" style="background:var(--accent-dark)">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== МОДАЛКА АВАРИЙНОГО ВЫЗОВА ===================== -->
+    <div id="emergencyModal" class="hidden absolute inset-0 z-40">
+      <div class="absolute inset-0 bg-black/45" onclick="closeEmergency()"></div>
+      <div class="sheet-in absolute bottom-0 left-0 right-0 card rounded-t-[2rem] px-6 pt-4 pb-9 flex flex-col items-center gap-5">
+        <div class="w-10 h-1.5 rounded-full bg-black/10"></div>
+        <div class="text-center">
+          <h3 class="font-extrabold text-[18px]">Аварийная диспетчерская</h3>
+          <p class="muted text-[13.5px] mt-1">Срочная связь с диспетчером</p>
+        </div>
+
+        <div class="w-full rounded-3xl p-6 flex flex-col items-center gap-3" style="background:var(--bg-tint)">
+          <div id="callIconWrap" class="w-20 h-20 rounded-full flex items-center justify-center" style="background:var(--danger-soft)">
+            <i data-lucide="phone" id="callIcon" class="w-8 h-8" style="color:var(--danger)"></i>
+          </div>
+          <p id="callStatusText" class="font-bold text-[15px] text-center">Готовы принять ваш вызов</p>
+          <p id="callSubText" class="muted text-[12.5px] text-center">Нажмите кнопку, чтобы позвонить диспетчеру</p>
+          <p id="callTimerText" class="hidden font-bold text-[14px]" style="color:var(--danger)">00:00</p>
+        </div>
+
+        <button id="callActionBtn" onclick="startCall()" class="tap w-full rounded-2xl py-4 font-semibold text-[15px] text-white flex items-center justify-center gap-2" style="background:var(--danger)">
+          <i data-lucide="phone-call" id="callActionIcon" class="w-4.5 h-4.5"></i>
+          <span id="callActionLabel">Позвонить диспетчеру</span>
+        </button>
+        <button onclick="closeEmergency()" class="text-[13.5px] font-semibold muted">Закрыть</button>
+      </div>
+    </div>
+
+    <!-- ===================== МОДАЛКА НОВОСТИ ===================== -->
+    <div id="newsModal" class="hidden absolute inset-0 z-30">
+      <div class="absolute inset-0 bg-black/40" onclick="closeNews()"></div>
+      <div class="sheet-in absolute bottom-0 left-0 right-0 max-h-[92%] card rounded-t-[2rem] px-5 pt-4 pb-8 flex flex-col gap-4 overflow-y-auto no-scrollbar">
+        <div class="w-10 h-1.5 rounded-full bg-black/10 mx-auto shrink-0"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="newsModalBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap">Новость</span>
+              <span id="newsModalDate" class="muted text-[12px]"></span>
+            </div>
+            <h3 class="font-extrabold text-[18px] mt-2 leading-snug" id="newsModalTitle">—</h3>
+          </div>
+          <button onclick="closeNews()" class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:var(--bg-tint)">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+        <p class="text-[14px] leading-relaxed" id="newsModalText">—</p>
+        <div id="newsModalAttachment" class="hidden"></div>
+      </div>
+    </div>
 
     <!-- ===================== МОДАЛКА КАМЕРЫ ===================== -->
     <div id="cameraModal" class="hidden absolute inset-0 z-30">
@@ -447,6 +655,422 @@
     lucide.createIcons();
   }
 
+  // ==================================================================
+  // ===================  КАМЕРЫ: ДОМА И ВОРОТА  =====================
+  // ==================================================================
+
+  const camHouses = [
+    { id:'142',   name:'142' },
+    { id:'142a',  name:'142 A' },
+    { id:'144',   name:'144' },
+    { id:'144a',  name:'144 A' },
+    { id:'144k1', name:'144 K 1' },
+  ];
+
+  const house144aCameras = [
+    { name:'Входная группа' },
+    { name:'Двор' },
+    { name:'Лифтовой холл' },
+    { name:'Парковка' },
+  ];
+
+  const gatesCameras = [
+    { id:'gate1', name:'Ворота 1' },
+    { id:'gate2', name:'Ворота 2' },
+  ];
+
+  function cameraThumbHtml(){
+    return `
+      <div class="relative w-20 h-16 rounded-xl overflow-hidden shrink-0" style="background:linear-gradient(160deg,#3a3f3b,#181a1c 75%)">
+        <i data-lucide="camera" class="w-5 h-5 text-white/30 absolute inset-0 m-auto"></i>
+        <span class="absolute bottom-1 left-1 flex items-center gap-1 bg-black/40 px-1.5 py-[1px] rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse-dot"></span>
+          <span class="text-white text-[9px] font-bold">LIVE</span>
+        </span>
+      </div>`;
+  }
+
+  function renderCameraHouses(){
+    const gateCardHtml = `
+      <button onclick="openGates()" class="tap card rounded-2xl p-4 w-full text-left flex items-center gap-3.5 fade-up">
+        <span class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+          <i data-lucide="square-parking" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="font-extrabold text-[15px]">Ворота</p>
+          <p class="muted text-[12.5px] mt-0.5">Камеры въездных ворот</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4.5 h-4.5 shrink-0" style="color:var(--text-muted)"></i>
+      </button>`;
+
+    const houseCardsHtml = camHouses.map((h,i) => `
+      <button onclick="openHouseCameras('${h.id}')" class="tap card rounded-2xl p-4 w-full text-left flex items-center gap-3.5 fade-up" style="animation-delay:${Math.min((i+1)*0.04,0.3)}s">
+        <span class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--bg-tint)">
+          <i data-lucide="camera" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="font-extrabold text-[15px]">${h.name}</p>
+          <p class="muted text-[12.5px] mt-0.5">Камеры дома</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4.5 h-4.5 shrink-0" style="color:var(--text-muted)"></i>
+      </button>`).join('');
+
+    document.getElementById('cameraHousesList').innerHTML = gateCardHtml + houseCardsHtml;
+    lucide.createIcons();
+  }
+
+  function openHouseCameras(id){
+    const house = camHouses.find(h => h.id === id);
+    if(!house) return;
+    document.getElementById('houseCamerasTitle').textContent = house.name;
+
+    const wrap = document.getElementById('houseCamerasContent');
+    if(id === '144a'){
+      wrap.innerHTML = house144aCameras.map((c,i) => `
+        <button onclick="openCamera('${c.name} · Дом 144 A')" class="tap card rounded-2xl p-3 flex items-center gap-3.5 w-full text-left fade-up" style="animation-delay:${Math.min(i*0.05,0.25)}s">
+          ${cameraThumbHtml()}
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-[14.5px]">${c.name}</p>
+            <p class="muted text-[12.5px] mt-0.5">Прямой эфир · Онлайн</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-4.5 h-4.5 shrink-0" style="color:var(--text-muted)"></i>
+        </button>`).join('');
+    } else {
+      wrap.innerHTML = `
+        <div class="card rounded-2xl p-8 flex flex-col items-center text-center gap-2.5 fade-up">
+          <span class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background:var(--bg-tint)">
+            <i data-lucide="camera-off" class="w-5.5 h-5.5" style="color:var(--text-muted)"></i>
+          </span>
+          <p class="font-semibold text-[14.5px]">Камеры пока не настроены в демо-версии</p>
+          <p class="muted text-[12.5px]">В готовом приложении здесь появится прямой эфир</p>
+        </div>`;
+    }
+
+    showScreen('houseCamerasScreen');
+    lucide.createIcons();
+  }
+  function backToCameras(){ showScreen('camerasScreen'); lucide.createIcons(); }
+
+  function openGates(){
+    document.getElementById('gatesList').innerHTML = gatesCameras.map((g,i) => `
+      <button onclick="openCamera('${g.name}')" class="tap card rounded-2xl p-3 flex items-center gap-3.5 w-full text-left fade-up" style="animation-delay:${Math.min(i*0.05,0.25)}s">
+        ${cameraThumbHtml()}
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-[14.5px]">${g.name}</p>
+          <p class="muted text-[12.5px] mt-0.5">Прямой эфир · Онлайн</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4.5 h-4.5 shrink-0" style="color:var(--text-muted)"></i>
+      </button>`).join('');
+    showScreen('gatesScreen');
+    lucide.createIcons();
+  }
+  function backFromGates(){ showScreen('camerasScreen'); lucide.createIcons(); }
+
+  // ==================================================================
+  // ===================  НОВОСТИ ОТ УК  ==============================
+  // ==================================================================
+
+  const newsData = [
+    {
+      id:1, type:'normal', icon:'paint-bucket',
+      title:'Обновили покраску ограждений',
+      text:'Завершили обновление покрытия ограждений на территории жилого комплекса.',
+      date:'15 сентября', attachment:null
+    },
+    {
+      id:2, type:'important', icon:'shield-alert',
+      title:'Установлено дополнительное ограждение',
+      text:'На территории возле детской площадки установлено дополнительное защитное ограждение.',
+      date:'14 сентября',
+      attachment:{ kind:'photos', count:3 }
+    },
+    {
+      id:3, type:'info', icon:'lightbulb',
+      title:'Проведены работы по освещению',
+      text:'Проверили и восстановили работу осветительных элементов на придомовой территории.',
+      date:'12 сентября',
+      attachment:{ kind:'video', label:'Видео с выполненных работ' }
+    },
+    {
+      id:4, type:'normal', icon:'file-text',
+      title:'Обновлены правила парковки во дворе',
+      text:'На информационных стендах размещены обновлённые правила парковки на придомовой территории — ознакомьтесь перед следующей поездкой.',
+      date:'10 сентября',
+      attachment:{ kind:'doc', label:'Информация для жителей.pdf' }
+    },
+  ];
+
+  function newsTypeMeta(type){
+    if(type === 'important') return { label:'Важно', color:'var(--danger)', soft:'var(--danger-soft)' };
+    if(type === 'info') return { label:'Информация', color:'var(--info)', soft:'var(--info-soft)' };
+    return { label:'Новость', color:'var(--accent-dark)', soft:'var(--accent-soft)' };
+  }
+
+  function renderNews(){
+    document.getElementById('newsList').innerHTML = newsData.map((n,i) => {
+      const meta = newsTypeMeta(n.type);
+      let attRow = '';
+      if(n.attachment){
+        if(n.attachment.kind === 'photos'){
+          attRow = `<div class="flex items-center gap-1.5 mt-2.5 text-[12px] font-semibold" style="color:var(--accent-dark)"><i data-lucide="images" class="w-4 h-4"></i>Фото: ${n.attachment.count}</div>`;
+        } else if(n.attachment.kind === 'video'){
+          attRow = `<div class="flex items-center gap-2 mt-2.5 rounded-xl p-2.5" style="background:var(--bg-tint)">
+              <span class="w-6.5 h-6.5 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-dark)"><i data-lucide="play" class="w-3.5 h-3.5 text-white"></i></span>
+              <span class="text-[12px] font-semibold truncate">${n.attachment.label}</span>
+            </div>`;
+        } else if(n.attachment.kind === 'doc'){
+          attRow = `<div class="flex items-center gap-2 mt-2.5 rounded-xl p-2.5" style="background:var(--bg-tint)">
+              <i data-lucide="paperclip" class="w-4 h-4 shrink-0" style="color:var(--accent-dark)"></i>
+              <span class="text-[12px] font-semibold truncate">${n.attachment.label}</span>
+            </div>`;
+        }
+      }
+      return `
+      <button onclick="openNews(${n.id})" class="tap card rounded-2xl p-4 w-full text-left fade-up" style="animation-delay:${Math.min(i*0.05,0.3)}s">
+        <div class="flex items-start gap-3">
+          <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${meta.soft}">
+            <i data-lucide="${n.icon}" class="w-4.5 h-4.5" style="color:${meta.color}"></i>
+          </span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10.5px] font-bold px-2 py-[3px] rounded-full whitespace-nowrap" style="background:${meta.soft}; color:${meta.color}">${meta.label}</span>
+              <span class="muted text-[11.5px]">${n.date}</span>
+            </div>
+            <p class="font-extrabold text-[14.5px] mt-1.5 leading-snug">${n.title}</p>
+            <p class="muted text-[12.5px] mt-1 leading-relaxed line-clamp-2">${n.text}</p>
+            ${attRow}
+          </div>
+        </div>
+      </button>`;
+    }).join('');
+    lucide.createIcons();
+  }
+
+  function openNews(id){
+    const n = newsData.find(x => x.id === id);
+    if(!n) return;
+    const meta = newsTypeMeta(n.type);
+
+    const badge = document.getElementById('newsModalBadge');
+    badge.textContent = meta.label;
+    badge.style.background = meta.soft;
+    badge.style.color = meta.color;
+    document.getElementById('newsModalDate').textContent = n.date;
+    document.getElementById('newsModalTitle').textContent = n.title;
+    document.getElementById('newsModalText').textContent = n.text;
+
+    const attWrap = document.getElementById('newsModalAttachment');
+    if(n.attachment){
+      attWrap.classList.remove('hidden');
+      if(n.attachment.kind === 'photos'){
+        attWrap.innerHTML = `<p class="text-[13px] font-bold mb-2.5">Фотографии</p>
+          <div class="grid grid-cols-3 gap-2">
+            ${Array.from({length:n.attachment.count}).map(() => `
+              <div class="relative aspect-square rounded-xl overflow-hidden flex items-center justify-center" style="background:linear-gradient(160deg,#3a3f3b,#181a1c 75%)">
+                <i data-lucide="image" class="w-5 h-5 text-white/30"></i>
+              </div>`).join('')}
+          </div>`;
+      } else if(n.attachment.kind === 'video'){
+        attWrap.innerHTML = `<p class="text-[13px] font-bold mb-2.5">Видео</p>
+          <button type="button" onclick="showToast('info','Видео доступно в полной версии')" class="tap w-full rounded-2xl p-3 flex items-center gap-3" style="background:var(--bg-tint)">
+            <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-dark)"><i data-lucide="play" class="w-4.5 h-4.5 text-white"></i></span>
+            <span class="text-[13px] font-semibold text-left">${n.attachment.label}</span>
+          </button>`;
+      } else if(n.attachment.kind === 'doc'){
+        attWrap.innerHTML = `<p class="text-[13px] font-bold mb-2.5">Документ</p>
+          <button type="button" onclick="showToast('file-text','Документ доступен в полной версии')" class="tap w-full rounded-2xl p-3 flex items-center gap-3" style="background:var(--bg-tint)">
+            <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-soft)"><i data-lucide="paperclip" class="w-4.5 h-4.5" style="color:var(--accent-dark)"></i></span>
+            <span class="text-[13px] font-semibold text-left">${n.attachment.label}</span>
+          </button>`;
+      }
+    } else {
+      attWrap.classList.add('hidden');
+      attWrap.innerHTML = '';
+    }
+
+    document.getElementById('newsModal').classList.remove('hidden');
+    lucide.createIcons();
+  }
+  function closeNews(){ document.getElementById('newsModal').classList.add('hidden'); }
+
+  // ==================================================================
+  // ===================  ЧАТ С УК  ===================================
+  // ==================================================================
+
+  let chatMessages = [
+    { from:'uk',   text:'Здравствуйте! Чем можем помочь?', time:'08:58' },
+    { from:'user', text:'Здравствуйте. Подскажите, когда планируется проверка освещения во дворе?', time:'09:12' },
+    { from:'uk',   text:'Здравствуйте! Проверка запланирована на сегодня. Специалист уже передал заявку в работу.', time:'09:15' },
+    { from:'user', text:'Спасибо, понял.', time:'09:16' },
+    { from:'uk',   text:'Пожалуйста! Если возникнут вопросы — пишите.', time:'09:16' },
+  ];
+  const ukAutoReplies = [
+    'Спасибо, ваше сообщение принято!',
+    'Хорошо, передадим информацию специалисту.',
+    'Приняли в работу, скоро ответим подробнее.',
+    'Записали, ответим в ближайшее время.',
+  ];
+  let ukAutoReplyIndex = 0;
+
+  function nowTimeStr(){
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function renderChatFile(file, from){
+    if(file.type === 'photo' && file.url){
+      return `<img src="${file.url}" class="rounded-xl mb-1.5 max-h-40 w-full object-cover">`;
+    }
+    const iconName = file.type === 'video' ? 'video' : 'file-text';
+    return `<div class="flex items-center gap-2 rounded-xl p-2 mb-1.5" style="background:${from==='user' ? 'rgba(255,255,255,.18)' : 'var(--bg-tint)'}">
+        <i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i>
+        <span class="text-[12px] font-semibold truncate">${escapeHtml(file.name || (file.type==='video' ? 'Видео' : 'Документ'))}</span>
+      </div>`;
+  }
+
+  function renderChat(){
+    document.getElementById('chatMessages').innerHTML = chatMessages.map(m => `
+      <div class="flex ${m.from === 'user' ? 'justify-end' : 'justify-start'} bubble-in">
+        <div class="max-w-[78%] rounded-2xl px-3.5 py-2.5 ${m.from === 'user' ? 'rounded-br-md' : 'rounded-bl-md'}" style="${m.from === 'user' ? 'background:var(--accent-dark); color:#fff;' : 'background:var(--card); border:1px solid var(--border);'}">
+          ${m.file ? renderChatFile(m.file, m.from) : ''}
+          ${m.text ? `<p class="text-[13.5px] leading-relaxed">${escapeHtml(m.text)}</p>` : ''}
+          <p class="text-[10.5px] mt-1 ${m.from === 'user' ? 'text-white/70' : 'muted'}">${m.time}</p>
+        </div>
+      </div>`).join('');
+    lucide.createIcons();
+    const el = document.getElementById('chatMessages');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function sendChatMessage(){
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if(!text) return;
+    chatMessages.push({ from:'user', text, time:nowTimeStr() });
+    input.value = '';
+    renderChat();
+    setTimeout(() => {
+      const reply = ukAutoReplies[ukAutoReplyIndex % ukAutoReplies.length];
+      ukAutoReplyIndex++;
+      chatMessages.push({ from:'uk', text:reply, time:nowTimeStr() });
+      renderChat();
+    }, 900 + Math.random()*500);
+  }
+
+  function toggleChatAttach(){
+    document.getElementById('chatAttachSheet').classList.toggle('hidden');
+  }
+  function chatPickFile(type){
+    document.getElementById('chatAttachSheet').classList.add('hidden');
+    if(type === 'photo') document.getElementById('chatPhotoInput').click();
+    else if(type === 'video') document.getElementById('chatVideoInput').click();
+    else document.getElementById('chatDocInput').click();
+  }
+  function handleChatFile(fileList, type){
+    const file = fileList[0];
+    if(!file) return;
+    const url = (type === 'photo') ? URL.createObjectURL(file) : null;
+    chatMessages.push({ from:'user', file:{ type, url, name:file.name }, time:nowTimeStr() });
+    renderChat();
+    setTimeout(() => {
+      chatMessages.push({ from:'uk', text:'Файл получен, спасибо! Передадим специалисту.', time:nowTimeStr() });
+      renderChat();
+    }, 1000);
+  }
+
+  // ==================================================================
+  // ===================  АВАРИЙНЫЙ ВЫЗОВ / ДИСПЕТЧЕРСКАЯ  ============
+  // ==================================================================
+
+  let callState = 'idle';
+  let callTimerInterval = null;
+  let callSeconds = 0;
+  let callStageTimeout = null;
+
+  function openEmergency(){
+    document.getElementById('emergencyModal').classList.remove('hidden');
+    resetCallUI();
+    lucide.createIcons();
+  }
+  function closeEmergency(){
+    document.getElementById('emergencyModal').classList.add('hidden');
+    clearInterval(callTimerInterval);
+    clearTimeout(callStageTimeout);
+    resetCallUI();
+  }
+  function resetCallUI(){
+    callState = 'idle';
+    callSeconds = 0;
+    clearInterval(callTimerInterval);
+    clearTimeout(callStageTimeout);
+    document.getElementById('callIconWrap').classList.remove('pulse-dot');
+    document.getElementById('callIconWrap').style.background = 'var(--danger-soft)';
+    const icon = document.getElementById('callIcon');
+    icon.setAttribute('data-lucide','phone');
+    icon.style.color = 'var(--danger)';
+    document.getElementById('callStatusText').textContent = 'Готовы принять ваш вызов';
+    document.getElementById('callSubText').textContent = 'Нажмите кнопку, чтобы позвонить диспетчеру';
+    document.getElementById('callTimerText').classList.add('hidden');
+    document.getElementById('callActionBtn').style.background = 'var(--danger)';
+    document.getElementById('callActionBtn').onclick = startCall;
+    document.getElementById('callActionIcon').setAttribute('data-lucide','phone-call');
+    document.getElementById('callActionLabel').textContent = 'Позвонить диспетчеру';
+    lucide.createIcons();
+  }
+
+  function startCall(){
+    callState = 'connecting';
+    document.getElementById('callIconWrap').classList.add('pulse-dot');
+    document.getElementById('callStatusText').textContent = 'Соединение...';
+    document.getElementById('callSubText').textContent = 'Устанавливаем связь с диспетчерской';
+    document.getElementById('callActionBtn').style.background = 'var(--text-muted)';
+    document.getElementById('callActionLabel').textContent = 'Соединение...';
+    document.getElementById('callActionBtn').onclick = null;
+    lucide.createIcons();
+
+    callStageTimeout = setTimeout(() => {
+      callState = 'ringing';
+      document.getElementById('callStatusText').textContent = 'Идёт дозвон...';
+      document.getElementById('callSubText').textContent = 'Пожалуйста, оставайтесь на линии';
+      callStageTimeout = setTimeout(connectCall, 1600);
+    }, 1200);
+  }
+
+  function connectCall(){
+    callState = 'connected';
+    callSeconds = 0;
+    document.getElementById('callIconWrap').classList.remove('pulse-dot');
+    document.getElementById('callIconWrap').style.background = 'var(--success-soft)';
+    const icon = document.getElementById('callIcon');
+    icon.setAttribute('data-lucide','phone-outgoing');
+    icon.style.color = 'var(--success)';
+    document.getElementById('callStatusText').textContent = 'Диспетчерская на связи';
+    document.getElementById('callSubText').textContent = 'Опишите ситуацию диспетчеру';
+    document.getElementById('callTimerText').classList.remove('hidden');
+    document.getElementById('callTimerText').textContent = '00:00';
+
+    const actionBtn = document.getElementById('callActionBtn');
+    actionBtn.style.background = 'var(--danger)';
+    document.getElementById('callActionIcon').setAttribute('data-lucide','phone-off');
+    document.getElementById('callActionLabel').textContent = 'Завершить вызов';
+    actionBtn.onclick = endCall;
+    lucide.createIcons();
+
+    callTimerInterval = setInterval(() => {
+      callSeconds++;
+      const m = String(Math.floor(callSeconds/60)).padStart(2,'0');
+      const s = String(callSeconds%60).padStart(2,'0');
+      document.getElementById('callTimerText').textContent = `${m}:${s}`;
+    }, 1000);
+  }
+
+  function endCall(){
+    clearInterval(callTimerInterval);
+    clearTimeout(callStageTimeout);
+    resetCallUI();
+    showToast('phone-off','Вызов завершён');
+  }
+
   // ---------- login ----------
   document.getElementById('loginForm').addEventListener('submit', (e)=>{
     e.preventDefault();
@@ -466,7 +1090,7 @@
 
   // ---------- навигация между разделами ----------
   function showScreen(id){
-    ['homeScreen','mainScreen','requestsScreen'].forEach(s=>{
+    ['homeScreen','mainScreen','requestsScreen','camerasScreen','houseCamerasScreen','gatesScreen','newsScreen','chatScreen'].forEach(s=>{
       const el = document.getElementById(s);
       if(s===id){
         el.classList.remove('hidden');
@@ -482,6 +1106,9 @@
   function goHome(){ showScreen('homeScreen'); updateHomeStats(); lucide.createIcons(); }
   function goAccess(){ showScreen('mainScreen'); switchTab('access'); lucide.createIcons(); }
   function goRequests(){ showScreen('requestsScreen'); renderTickets(); lucide.createIcons(); }
+  function goCameras(){ showScreen('camerasScreen'); renderCameraHouses(); lucide.createIcons(); }
+  function goNews(){ showScreen('newsScreen'); renderNews(); lucide.createIcons(); }
+  function goChat(){ showScreen('chatScreen'); renderChat(); lucide.createIcons(); document.getElementById('chatAttachSheet').classList.add('hidden'); }
 
   // ---------- tabs (доступ/камеры) ----------
   function switchTab(tab){
@@ -1011,6 +1638,9 @@
   renderAccess();
   renderCameras();
   renderTickets();
+  renderCameraHouses();
+  renderNews();
+  renderChat();
   updateHomeStats();
   lucide.createIcons();
 </script>
