@@ -29,10 +29,62 @@
     --clarify-soft:#F5E4DC;
     --danger:#D9604A;
     --danger-soft:#F8E1DA;
+    --ui-scale:1;
+  }
+  [data-theme="light"]{
+    --bg:#FAFAF7;
+    --bg-tint:#F3F5F2;
+    --card:#FFFFFF;
+    --border:rgba(24,24,20,0.07);
+    --text:#26241F;
+    --text-muted:#948F85;
+    --accent:#5F8A81;
+    --accent-dark:#4C716A;
+    --accent-soft:#E7EFEC;
+    --success:#6FA377;
+    --success-soft:#E7F2E8;
+    --amber:#C99A55;
+    --amber-soft:#F5EBDC;
+    --info:#5B84BA;
+    --info-soft:#E9EFF7;
+    --clarify:#C97B55;
+    --clarify-soft:#F5E4DC;
+    --danger:#D9604A;
+    --danger-soft:#F8E1DA;
+  }
+  [data-theme="dark"]{
+    --bg:#1E211F;
+    --bg-tint:#181A18;
+    --card:#262A26;
+    --border:rgba(255,255,255,0.09);
+    --text:#F1EFE9;
+    --text-muted:#9B9890;
+    --accent:#7FB3A6;
+    --accent-dark:#5C8C80;
+    --accent-soft:#233530;
+    --success:#7FBF8B;
+    --success-soft:#1E322A;
+    --amber:#E0B36E;
+    --amber-soft:#372C1C;
+    --info:#7DA6DA;
+    --info-soft:#1E2A3A;
+    --clarify:#E0956B;
+    --clarify-soft:#372A1F;
+    --danger:#E4785F;
+    --danger-soft:#3A2420;
   }
   *{ font-family:'Manrope',system-ui,sans-serif; }
   body{ background:var(--bg-tint); }
   .outer-bg{ background: radial-gradient(120% 120% at 50% 0%, #F6F4EE 0%, #EEF1EC 55%, #E7ECE8 100%); }
+  html[data-theme="dark"] .outer-bg{ background: radial-gradient(120% 120% at 50% 0%, #23261F 0%, #1B1D1B 55%, #141614 100%); }
+  body, .card, .phone, .status-badge{ transition: background-color .3s ease, border-color .3s ease, color .3s ease; }
+  html.theme-swap-instant, html.theme-swap-instant *{ transition: none !important; }
+  .scale-root{ position:absolute; top:0; left:0; width:calc(100% / var(--ui-scale)); height:calc(100% / var(--ui-scale)); transform:scale(var(--ui-scale)); transform-origin: top left; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; background:var(--bg-tint); cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track{ height:6px; border-radius:999px; background:var(--bg-tint); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:20px; height:20px; margin-top:-7px; border-radius:50%; background:var(--accent-dark); box-shadow:0 2px 8px rgba(0,0,0,.25); cursor:pointer; }
+  input[type=range]::-moz-range-track{ height:6px; border-radius:999px; background:var(--bg-tint); }
+  input[type=range]::-moz-range-thumb{ width:20px; height:20px; border:none; border-radius:50%; background:var(--accent-dark); cursor:pointer; }
   .phone{ background:var(--bg); color:var(--text); }
   .card{ background:var(--card); border:1px solid var(--border); }
   .muted{ color:var(--text-muted); }
@@ -59,10 +111,22 @@
   @keyframes ringPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(217,96,74,.35);} 50%{ box-shadow:0 0 0 10px rgba(217,96,74,0);} }
   .bubble-in{ animation: fadeUp .3s cubic-bezier(.2,.8,.3,1) both; }
 </style>
+<script>
+(function(){
+  try{
+    var theme = localStorage.getItem('scTheme');
+    document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+    var scale = localStorage.getItem('scFontScale');
+    if(scale){ document.documentElement.style.setProperty('--ui-scale', (parseFloat(scale)/100)); }
+  }catch(e){}
+})();
+</script>
 </head>
 <body class="outer-bg min-h-[100dvh] flex items-center justify-center sm:py-8">
 
   <div id="app" class="phone relative w-full h-[100dvh] sm:h-[844px] sm:w-[390px] sm:rounded-[2.6rem] sm:shadow-[0_30px_60px_-15px_rgba(30,35,30,0.25)] sm:border sm:border-black/5 overflow-hidden">
+
+    <div id="scaleRoot" class="scale-root">
 
     <!-- ===================== ЭКРАН ВХОДА ===================== -->
     <section id="loginScreen" class="absolute inset-0 flex flex-col px-7 pt-16 pb-8">
@@ -121,9 +185,14 @@
             <i data-lucide="triangle-alert" class="w-4 h-4" style="color:var(--danger)"></i>
             <span class="text-[11.5px] font-bold" style="color:var(--danger)">Диспетчер</span>
           </button>
-          <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
-            <i data-lucide="user-round" class="w-5 h-5" style="color:var(--accent-dark)"></i>
-          </div>
+          <button id="themeToggleBtn" onclick="toggleTheme()" class="tap card w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+            <i id="themeToggleIcon" data-lucide="sun" class="w-[18px] h-[18px]" style="color:var(--amber)"></i>
+          </button>
+          <button id="profileBtn" onclick="openProfile()" class="tap w-11 h-11 rounded-full flex items-center justify-center shrink-0 overflow-hidden" style="background:var(--accent-soft)">
+            <span id="profileAvatarMini" class="w-full h-full flex items-center justify-center">
+              <i data-lucide="user-round" class="w-5 h-5" style="color:var(--accent-dark)"></i>
+            </span>
+          </button>
         </div>
       </header>
 
@@ -380,6 +449,96 @@
       </div>
     </section>
 
+    <!-- ===================== ЭКРАН «ПРОФИЛЬ» ===================== -->
+    <section id="profileScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="closeProfile()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Профиль</h2>
+      </header>
+
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 pb-10">
+
+        <div class="flex flex-col items-center gap-3 fade-up" style="animation-delay:.02s">
+          <div id="profileAvatarBig" class="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-[0_10px_24px_-8px_rgba(30,35,30,0.3)]" style="background:var(--accent-soft)">
+            <i data-lucide="user-round" class="w-10 h-10" style="color:var(--accent-dark)"></i>
+          </div>
+          <div class="text-center">
+            <p class="font-extrabold text-[18px]">Житель</p>
+            <p class="muted text-[13px] mt-0.5">ЖК «Южный квартал» · кв. 214</p>
+          </div>
+          <button onclick="document.getElementById('avatarUploadInput').click()" class="tap text-[13px] font-semibold px-4 py-2 rounded-full" style="background:var(--accent-soft); color:var(--accent-dark)">
+            Загрузить фото
+          </button>
+          <input type="file" id="avatarUploadInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(this.files); this.value='';">
+        </div>
+
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-2.5 mt-7 fade-up" style="animation-delay:.05s">Готовые аватары</p>
+        <div id="avatarPresetGrid" class="grid grid-cols-3 gap-2.5 fade-up" style="animation-delay:.07s">
+          <!-- injected by JS -->
+        </div>
+
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-2.5 mt-7 fade-up" style="animation-delay:.09s">Управление</p>
+        <div class="space-y-3 fade-up" style="animation-delay:.11s">
+          <button onclick="openSettings()" class="tap card rounded-2xl p-4 w-full text-left flex items-center gap-3">
+            <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+              <i data-lucide="settings-2" class="w-[18px] h-[18px]" style="color:var(--accent-dark)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-[14.5px]">Настройки</p>
+              <p class="muted text-[12px] mt-0.5">Размер шрифта интерфейса</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-4.5 h-4.5 shrink-0" style="color:var(--text-muted)"></i>
+          </button>
+
+          <button onclick="handleLogout()" class="tap card rounded-2xl p-4 w-full text-left flex items-center gap-3">
+            <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:var(--danger-soft)">
+              <i data-lucide="log-out" class="w-[18px] h-[18px]" style="color:var(--danger)"></i>
+            </span>
+            <p class="font-bold text-[14.5px]" style="color:var(--danger)">Выйти</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ЭКРАН «НАСТРОЙКИ» ===================== -->
+    <section id="settingsScreen" class="absolute inset-0 hidden flex-col">
+      <header class="px-6 pt-14 pb-2 flex items-center gap-3 shrink-0">
+        <button onclick="closeSettings()" class="tap w-10 h-10 rounded-full flex items-center justify-center card shrink-0">
+          <i data-lucide="arrow-left" class="w-4.5 h-4.5"></i>
+        </button>
+        <h2 class="text-[19px] font-extrabold">Настройки</h2>
+      </header>
+
+      <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 pb-10">
+
+        <div class="card rounded-3xl p-5 fade-up" style="animation-delay:.02s">
+          <p class="font-extrabold text-[15.5px] mb-1">Размер шрифта</p>
+          <p class="muted text-[12.5px] mb-4">Настройте комфортный размер текста интерфейса</p>
+          <input type="range" id="fontScaleSlider" min="92" max="112" step="1" value="100" oninput="onFontScaleChange(this.value)">
+          <div class="flex justify-between mt-1.5 text-[11px] muted">
+            <span>Меньше</span>
+            <span>Стандартный</span>
+            <span>Больше</span>
+          </div>
+        </div>
+
+        <p class="muted text-[12.5px] font-bold uppercase tracking-wide mb-2.5 mt-6 fade-up" style="animation-delay:.05s">Пример</p>
+        <div class="fade-up" style="animation-delay:.07s">
+          <div class="card rounded-3xl p-5 flex items-center gap-4">
+            <span class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background:var(--accent-soft)">
+              <i data-lucide="door-closed" class="w-6 h-6" style="color:var(--accent-dark)"></i>
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-extrabold text-[16.5px]">Калитка</p>
+              <p class="muted text-[13px] mt-0.5">Нажмите, чтобы открыть</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===================== МОДАЛКА АВАРИЙНОГО ВЫЗОВА ===================== -->
     <div id="emergencyModal" class="hidden absolute inset-0 z-40">
       <div class="absolute inset-0 bg-black/45" onclick="closeEmergency()"></div>
@@ -591,12 +750,20 @@
     </div>
 
     <!-- toast -->
-    <div id="toast" class="hidden toast-in absolute top-14 left-1/2 z-40 card rounded-full pl-2.5 pr-4 py-2 flex items-center gap-2 shadow-[0_12px_30px_-10px_rgba(30,35,30,0.3)]">
+    <div id="toast" class="hidden toast-in absolute top-14 left-1/2 z-40 card rounded-full pl-2.5 pr-4 py-2 flex items-center gap-2 shadow-[0_12px_30px_-10px_rgba(30,35,30,0.3)] max-w-[calc(100%-48px)]">
       <span id="toastIconWrap" class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background:var(--success-soft)">
         <i data-lucide="check" id="toastIcon" class="w-4 h-4" style="color:var(--success)"></i>
       </span>
-      <span id="toastText" class="text-[13.5px] font-semibold whitespace-nowrap"></span>
+      <span id="toastText" class="text-[13.5px] font-semibold leading-snug min-w-0" style="overflow-wrap:anywhere; word-break:break-word;"></span>
     </div>
+
+    </div><!-- /scaleRoot -->
+
+    <!-- morph-оверлей для анимации открытия/закрытия профиля -->
+    <div id="profileMorph" class="hidden" style="position:absolute; z-index:80; pointer-events:none;"></div>
+
+    <!-- оверлей круговой анимации смены темы -->
+    <!-- создаётся динамически в toggleTheme() -->
 
   </div>
 
@@ -1090,7 +1257,7 @@
 
   // ---------- навигация между разделами ----------
   function showScreen(id){
-    ['homeScreen','mainScreen','requestsScreen','camerasScreen','houseCamerasScreen','gatesScreen','newsScreen','chatScreen'].forEach(s=>{
+    ['homeScreen','mainScreen','requestsScreen','camerasScreen','houseCamerasScreen','gatesScreen','newsScreen','chatScreen','profileScreen','settingsScreen'].forEach(s=>{
       const el = document.getElementById(s);
       if(s===id){
         el.classList.remove('hidden');
@@ -1109,6 +1276,292 @@
   function goCameras(){ showScreen('camerasScreen'); renderCameraHouses(); lucide.createIcons(); }
   function goNews(){ showScreen('newsScreen'); renderNews(); lucide.createIcons(); }
   function goChat(){ showScreen('chatScreen'); renderChat(); lucide.createIcons(); document.getElementById('chatAttachSheet').classList.add('hidden'); }
+
+  // ==================================================================
+  // ===========================  ПРОФИЛЬ  ===========================
+  // ==================================================================
+
+  const avatarPresets = [
+    { id:'wolf', label:'Волк', svg:`
+      <svg viewBox="0 0 64 64" class="w-full h-full">
+        <polygon points="12,22 20,4 27,24" fill="#8A97A0"/>
+        <polygon points="52,22 44,4 37,24" fill="#8A97A0"/>
+        <polygon points="15,19 20,9 23,22" fill="#5B6670"/>
+        <polygon points="49,19 44,9 41,22" fill="#5B6670"/>
+        <circle cx="32" cy="35" r="19" fill="#B7C0C7"/>
+        <ellipse cx="32" cy="43" rx="10" ry="8" fill="#F4F1EA"/>
+        <circle cx="23" cy="31" r="3" fill="#26241F"/>
+        <circle cx="41" cy="31" r="3" fill="#26241F"/>
+        <circle cx="32" cy="42" r="2.6" fill="#26241F"/>
+        <path d="M25 48 Q32 53 39 48" stroke="#26241F" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>` },
+    { id:'capybara', label:'Капибара', svg:`
+      <svg viewBox="0 0 64 64" class="w-full h-full">
+        <circle cx="14" cy="20" r="6" fill="#C79A6B"/>
+        <circle cx="50" cy="20" r="6" fill="#C79A6B"/>
+        <circle cx="14" cy="20" r="3" fill="#A97C4F"/>
+        <circle cx="50" cy="20" r="3" fill="#A97C4F"/>
+        <ellipse cx="32" cy="36" rx="22" ry="18" fill="#D2A97A"/>
+        <ellipse cx="32" cy="45" rx="13" ry="9" fill="#EBD3AE"/>
+        <path d="M22 32 q3 -3 6 0" stroke="#4A3420" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M36 32 q3 -3 6 0" stroke="#4A3420" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <ellipse cx="27" cy="46" rx="2.2" ry="1.6" fill="#4A3420"/>
+        <ellipse cx="37" cy="46" rx="2.2" ry="1.6" fill="#4A3420"/>
+      </svg>` },
+    { id:'dog', label:'Собака', svg:`
+      <svg viewBox="0 0 64 64" class="w-full h-full">
+        <ellipse cx="15" cy="27" rx="8" ry="13" fill="#C79A6B" transform="rotate(-18 15 27)"/>
+        <ellipse cx="49" cy="27" rx="8" ry="13" fill="#C79A6B" transform="rotate(18 49 27)"/>
+        <circle cx="32" cy="35" r="19" fill="#E8C79A"/>
+        <ellipse cx="32" cy="43" rx="11" ry="9" fill="#FBEFDD"/>
+        <circle cx="24" cy="31" r="3" fill="#26241F"/>
+        <circle cx="40" cy="31" r="3" fill="#26241F"/>
+        <ellipse cx="32" cy="41" rx="3.2" ry="2.4" fill="#26241F"/>
+        <path d="M32 43.5 Q32 47 29 48" stroke="#26241F" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M25 50 Q32 54 39 50" stroke="#26241F" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>` },
+  ];
+
+  let userAvatar = { type:'default' };
+
+  function renderAvatarPresetGrid(){
+    const grid = document.getElementById('avatarPresetGrid');
+    if(!grid) return;
+    grid.innerHTML = avatarPresets.map(p => `
+      <button type="button" onclick="selectAvatarPreset('${p.id}')" id="avatarPreset-${p.id}" aria-label="${p.label}" class="tap card rounded-2xl p-2.5 flex items-center justify-center">
+        <span class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shrink-0" style="background:var(--accent-soft)">${p.svg}</span>
+      </button>`).join('');
+  }
+
+  function highlightPresetSelection(){
+    avatarPresets.forEach(p => {
+      const el = document.getElementById(`avatarPreset-${p.id}`);
+      if(!el) return;
+      if(userAvatar.type === 'preset' && userAvatar.id === p.id){
+        el.style.borderColor = 'var(--accent-dark)';
+        el.style.background = 'var(--accent-soft)';
+      } else {
+        el.style.borderColor = '';
+        el.style.background = '';
+      }
+    });
+  }
+
+  function avatarHtmlFor(size){
+    const iconSize = size === 'big' ? 'w-10 h-10' : 'w-5 h-5';
+    if(userAvatar.type === 'preset'){
+      const p = avatarPresets.find(x => x.id === userAvatar.id);
+      if(p) return p.svg;
+    }
+    if(userAvatar.type === 'photo' && userAvatar.url){
+      return `<img src="${userAvatar.url}" class="w-full h-full object-cover">`;
+    }
+    return `<i data-lucide="user-round" class="${iconSize}" style="color:var(--accent-dark)"></i>`;
+  }
+
+  function applyAvatar(){
+    const big = document.getElementById('profileAvatarBig');
+    const mini = document.getElementById('profileAvatarMini');
+    if(big) big.innerHTML = avatarHtmlFor('big');
+    if(mini) mini.innerHTML = avatarHtmlFor('mini');
+    lucide.createIcons();
+  }
+
+  function saveAvatarToStorage(){
+    try{ localStorage.setItem('scAvatar', JSON.stringify(userAvatar)); }catch(e){}
+  }
+
+  function selectAvatarPreset(id){
+    userAvatar = { type:'preset', id };
+    applyAvatar();
+    highlightPresetSelection();
+    saveAvatarToStorage();
+    showToast('check','Аватар обновлён');
+  }
+
+  function handleAvatarUpload(files){
+    const file = files && files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      userAvatar = { type:'photo', url: e.target.result };
+      applyAvatar();
+      highlightPresetSelection();
+      saveAvatarToStorage();
+      showToast('check','Фото обновлено');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleLogout(){
+    showToast('log-out','Выход из аккаунта — демонстрационный режим');
+  }
+
+  // ---------- анимация "морф" открытия/закрытия профиля ----------
+  function openProfile(){
+    const btn = document.getElementById('profileBtn');
+    const app = document.getElementById('app');
+    const morph = document.getElementById('profileMorph');
+    const btnRect = btn.getBoundingClientRect();
+    const appRect = app.getBoundingClientRect();
+
+    morph.style.transition = 'none';
+    morph.style.left = (btnRect.left - appRect.left) + 'px';
+    morph.style.top = (btnRect.top - appRect.top) + 'px';
+    morph.style.width = btnRect.width + 'px';
+    morph.style.height = btnRect.height + 'px';
+    morph.style.borderRadius = '50%';
+    morph.style.background = 'var(--accent-soft)';
+    morph.style.opacity = '1';
+    morph.classList.remove('hidden');
+
+    void morph.offsetWidth;
+
+    morph.style.transition = 'left .48s cubic-bezier(.22,.8,.24,1), top .48s cubic-bezier(.22,.8,.24,1), width .48s cubic-bezier(.22,.8,.24,1), height .48s cubic-bezier(.22,.8,.24,1), border-radius .48s cubic-bezier(.22,.8,.24,1), background-color .45s ease';
+    morph.style.left = '0px';
+    morph.style.top = '0px';
+    morph.style.width = appRect.width + 'px';
+    morph.style.height = appRect.height + 'px';
+    morph.style.borderRadius = '0px';
+    morph.style.background = 'var(--bg)';
+
+    setTimeout(()=>{
+      showScreen('profileScreen');
+      applyAvatar();
+      highlightPresetSelection();
+      lucide.createIcons();
+      morph.style.transition = 'opacity .22s ease';
+      morph.style.opacity = '0';
+      setTimeout(()=>{ morph.classList.add('hidden'); }, 230);
+    }, 480);
+  }
+
+  function closeProfile(){
+    const btn = document.getElementById('profileBtn');
+    const app = document.getElementById('app');
+    const morph = document.getElementById('profileMorph');
+    const btnRect = btn.getBoundingClientRect();
+    const appRect = app.getBoundingClientRect();
+
+    morph.style.transition = 'none';
+    morph.style.left = '0px';
+    morph.style.top = '0px';
+    morph.style.width = appRect.width + 'px';
+    morph.style.height = appRect.height + 'px';
+    morph.style.borderRadius = '0px';
+    morph.style.background = 'var(--bg)';
+    morph.style.opacity = '1';
+    morph.classList.remove('hidden');
+
+    void morph.offsetWidth;
+
+    showScreen('homeScreen');
+    updateHomeStats();
+    lucide.createIcons();
+
+    requestAnimationFrame(()=>{
+      morph.style.transition = 'left .42s cubic-bezier(.3,.7,.3,1), top .42s cubic-bezier(.3,.7,.3,1), width .42s cubic-bezier(.3,.7,.3,1), height .42s cubic-bezier(.3,.7,.3,1), border-radius .42s cubic-bezier(.3,.7,.3,1), background-color .4s ease';
+      morph.style.left = (btnRect.left - appRect.left) + 'px';
+      morph.style.top = (btnRect.top - appRect.top) + 'px';
+      morph.style.width = btnRect.width + 'px';
+      morph.style.height = btnRect.height + 'px';
+      morph.style.borderRadius = '50%';
+      morph.style.background = 'var(--accent-soft)';
+    });
+
+    setTimeout(()=>{
+      morph.style.transition = 'opacity .2s ease';
+      morph.style.opacity = '0';
+      setTimeout(()=>{ morph.classList.add('hidden'); }, 210);
+    }, 430);
+  }
+
+  function openSettings(){ showScreen('settingsScreen'); lucide.createIcons(); }
+  function closeSettings(){ showScreen('profileScreen'); lucide.createIcons(); }
+
+  // ---------- размер шрифта / масштаб интерфейса ----------
+  function onFontScaleChange(val){
+    const scale = parseFloat(val) / 100;
+    document.documentElement.style.setProperty('--ui-scale', scale);
+    try{ localStorage.setItem('scFontScale', val); }catch(e){}
+  }
+
+  // ---------- тема (светлая/тёмная) с круговой анимацией ----------
+  function toggleTheme(){
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    const nextTheme = isDark ? 'light' : 'dark';
+
+    const btn = document.getElementById('themeToggleBtn');
+    const app = document.getElementById('app');
+    const scaleRoot = document.getElementById('scaleRoot');
+    const btnRect = btn.getBoundingClientRect();
+    const appRect = app.getBoundingClientRect();
+    const x = btnRect.left + btnRect.width/2 - appRect.left;
+    const y = btnRect.top + btnRect.height/2 - appRect.top;
+    const maxRadius = Math.ceil(Math.hypot(Math.max(x, appRect.width - x), Math.max(y, appRect.height - y))) + 4;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'themeSweepOverlay';
+    overlay.setAttribute('data-theme', nextTheme);
+    overlay.style.position = 'absolute';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '90';
+    overlay.style.overflow = 'hidden';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.background = 'var(--bg)';
+    overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+
+    const clone = scaleRoot.cloneNode(true);
+    clone.removeAttribute('id');
+    overlay.appendChild(clone);
+    app.appendChild(overlay);
+
+    requestAnimationFrame(()=>{
+      overlay.style.transition = 'clip-path .55s cubic-bezier(.22,.8,.22,1)';
+      overlay.style.clipPath = `circle(${maxRadius}px at ${x}px ${y}px)`;
+    });
+
+    setTimeout(()=>{
+      const icon = document.getElementById('themeToggleIcon');
+      icon.setAttribute('data-lucide', nextTheme === 'dark' ? 'moon' : 'sun');
+      icon.style.color = nextTheme === 'dark' ? 'var(--info)' : 'var(--amber)';
+      lucide.createIcons();
+    }, 180);
+
+    setTimeout(()=>{
+      const html2 = document.documentElement;
+      html2.classList.add('theme-swap-instant');
+      html2.setAttribute('data-theme', nextTheme);
+      try{ localStorage.setItem('scTheme', nextTheme); }catch(e){}
+      overlay.remove();
+      void document.body.offsetWidth;
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          html2.classList.remove('theme-swap-instant');
+        });
+      });
+    }, 580);
+  }
+
+  function loadInitialSettings(){
+    try{
+      const avatarRaw = localStorage.getItem('scAvatar');
+      if(avatarRaw) userAvatar = JSON.parse(avatarRaw);
+    }catch(e){}
+    applyAvatar();
+
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const icon = document.getElementById('themeToggleIcon');
+    if(icon){
+      icon.setAttribute('data-lucide', theme === 'dark' ? 'moon' : 'sun');
+      icon.style.color = theme === 'dark' ? 'var(--info)' : 'var(--amber)';
+    }
+
+    const savedScale = localStorage.getItem('scFontScale');
+    const slider = document.getElementById('fontScaleSlider');
+    if(slider && savedScale) slider.value = savedScale;
+  }
 
   // ---------- tabs (доступ/камеры) ----------
   function switchTab(tab){
@@ -1641,6 +2094,8 @@
   renderCameraHouses();
   renderNews();
   renderChat();
+  renderAvatarPresetGrid();
+  loadInitialSettings();
   updateHomeStats();
   lucide.createIcons();
 </script>
